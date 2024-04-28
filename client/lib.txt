@@ -1,0 +1,4 @@
+npm i react-redux @reduxjs/toolkit redux-persist react-dropzone dotenv formik yup react-router-dom@6 @mui/material @emotion/react @emotion/styled @mui/icons-material
+
+ConnectU: Phản ánh sứ mệnh của nền tảng là kết nối người dùng và thúc đẩy các mối quan hệ có ý nghĩa.
+ConnectU: Reflects the platform's mission to connect users and foster meaningful relationships.
