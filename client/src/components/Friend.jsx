@@ -2,16 +2,17 @@ import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFriends } from "../State";
+import { setFriends } from "../Redux/Slice/auth";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
+import StyledBadge from "./StyledBadge";
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { _id } = useSelector((state) => state.user);
-  const token = useSelector((state) => state.token);
-  const friends = useSelector((state) => state.user.friends);
+  const { _id } = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
+  const { friends } = useSelector((state) => state.auth.user);
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -33,13 +34,28 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
       }
     );
     const data = await response.json();
+    // console.log(data);
     dispatch(setFriends({ friends: data }));
   };
+  const onlineUsers = useSelector((state) => state.app.onlineUsers);
+
+  const online = onlineUsers.includes(friendId);
 
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+        {online ? (
+          <StyledBadge
+            overlap="circular"
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            variant="dot"
+          >
+            <UserImage image={userPicturePath} size="55px" />
+          </StyledBadge>
+        ) : (
+          <UserImage image={userPicturePath} size="55px" />
+        )}
+
         <Box
           onClick={() => {
             navigate(`/profile/${friendId}`);

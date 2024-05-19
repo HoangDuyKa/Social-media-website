@@ -12,10 +12,30 @@ import { SimpleBarStyle } from "components/Scrollbar";
 import { Search, SearchIconWrapper, StyledInputBase } from "components/Search";
 import { ChatList } from "../../data";
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Chats = () => {
   const theme = useTheme();
+  const token = useSelector((state) => state.auth.token);
+
+  const [conversations, setConversations] = useState([]);
+
+  // console.log(conversations);
+
+  const getConversations = async () => {
+    const res = await fetch(`http://localhost:3001/users/getUsersForSidebar`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const conversations = await res.json();
+    setConversations(conversations);
+  };
+
+  // console.log(conversations);
+  useEffect(() => {
+    getConversations();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <Box
       sx={{
@@ -66,7 +86,7 @@ const Chats = () => {
           sx={{ flexGrow: 1, overflowY: "scroll", height: "100%" }}
         >
           <SimpleBarStyle timeout={500} clickOnTrack={false}>
-            <Stack sx={{}} spacing={2.4}>
+            {/* <Stack sx={{}} spacing={2.4}>
               <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                 Pinned
               </Typography>
@@ -81,6 +101,16 @@ const Chats = () => {
               {ChatList.filter((el) => !el.pinned).map((el) => {
                 return <ChatElement {...el} />;
               })}
+            </Stack> */}
+            <Stack sx={{}} spacing={2.4}>
+              <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                All Chats
+              </Typography>
+              {conversations
+                // .filter((el) => !el.pinned)
+                .map((el) => {
+                  return <ChatElement key={el._id} {...el} />;
+                })}
             </Stack>
           </SimpleBarStyle>
         </Stack>

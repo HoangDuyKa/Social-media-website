@@ -190,14 +190,15 @@ const MediaMsg = ({ el }) => {
 
 const TextMsg = ({ el, menu }) => {
   const theme = useTheme();
+  const receiver = el.receiverId ? true : false;
   const placement = el.incoming ? "left" : "right";
 
-  return el.incoming ? (
-    <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
+  return receiver ? (
+    <Stack direction={"row"} justifyContent={receiver ? "start" : "end"}>
       <Box
         p={1.5}
         sx={{
-          backgroundColor: el.incoming
+          backgroundColor: receiver
             ? theme.palette.background.default
             : theme.palette.primary.main,
         }}
@@ -206,7 +207,7 @@ const TextMsg = ({ el, menu }) => {
       >
         <Typography
           variant="body2"
-          color={el.incoming ? theme.palette.text : "#fff"}
+          color={receiver ? theme.palette.text : "#fff"}
         >
           {el.message}
         </Typography>
@@ -214,13 +215,13 @@ const TextMsg = ({ el, menu }) => {
       {menu && <MessageOption placement={placement} />}
     </Stack>
   ) : (
-    <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
+    <Stack direction={"row"} justifyContent={receiver ? "start" : "end"}>
       {menu && <MessageOption placement={placement} />}
 
       <Box
         p={1.5}
         sx={{
-          backgroundColor: el.incoming
+          backgroundColor: receiver
             ? theme.palette.background.default
             : theme.palette.primary.mess,
         }}
@@ -229,7 +230,7 @@ const TextMsg = ({ el, menu }) => {
       >
         <Typography
           variant="body2"
-          color={el.incoming ? theme.palette.text : "#fff"}
+          color={receiver ? theme.palette.text : "#fff"}
         >
           {el.message}
         </Typography>

@@ -11,7 +11,7 @@ import React from "react";
 import { faker } from "@faker-js/faker";
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from "phosphor-react";
 import StyledBadge from "components/StyledBadge";
-import { toggleRightbar } from "State";
+import { toggleRightbar } from "Redux/Slice/app";
 import { useDispatch } from "react-redux";
 
 const ChatHeader = () => {

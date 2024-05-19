@@ -3,13 +3,14 @@ import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "State";
+import { setFriends } from "Redux/Slice/auth";
 
 const FriendListWidget = ({ userId, style }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
-  const token = useSelector((state) => state.token);
-  const friends = useSelector((state) => state.user.friends);
+  const token = useSelector((state) => state.auth.token);
+  const { friends } = useSelector((state) => state.auth.user);
+  console.log();
 
   const getFriends = async () => {
     const response = await fetch(

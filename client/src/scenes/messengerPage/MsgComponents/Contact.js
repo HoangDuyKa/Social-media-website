@@ -27,7 +27,7 @@ import {
 } from "phosphor-react";
 import { useDispatch } from "react-redux";
 import { faker } from "@faker-js/faker";
-import { toggleRightbar, updateRightBarType } from "State";
+import { toggleRightbar, updateRightBarType } from "Redux/Slice/app";
 import AntSwitch from "components/AntSwitch";
 
 const Transition = React.forwardRef(function Transition(props, ref) {

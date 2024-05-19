@@ -6,48 +6,69 @@ import {
   Typography,
   styled,
   useTheme,
+  alpha,
 } from "@mui/material";
+import { useSocketContext } from "SocketContext";
+import { useDispatch, useSelector } from "react-redux";
+import StyledBadge from "./StyledBadge";
+import {
+  SetSelectedConversation,
+  setSelectedConversation,
+} from "Redux/Slice/conversation";
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    boxShadow: `0 0 0 2px ${theme.palette.background.default}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.8)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
+const StyledChatBox = styled(Box)(({ theme }) => ({
+  "&:hover": {
+    cursor: "pointer",
   },
 }));
 
-export const ChatElement = ({ img, name, msg, time, unread, online, id }) => {
+export const ChatElement = ({
+  // img,
+  // name,
+  // msg,
+  // time,
+  // unread,
+  // online,
+  _id,
+  msg,
+  time,
+  unread,
+  picturePath,
+  firstName,
+  lastName,
+  ...other
+}) => {
   const theme = useTheme();
+  const name = `${firstName} ${lastName}`;
+  const onlineUsers = useSelector((state) => state.app.onlineUsers);
+  const online = onlineUsers.includes(_id);
+
+  const dispatch = useDispatch();
+  // console.log(other);
+  const conversation = { _id, picturePath, firstName, lastName, ...other };
+  // console.log(conversation);
+
+  const selectedConversation = useSelector(
+    (state) => state.conversation.selectedConversation
+  );
+  const isSelected = selectedConversation._id === _id;
+  // console.log(selectedConversation);
+
   return (
-    <Box
+    <StyledChatBox
+      onClick={() => {
+        dispatch(
+          setSelectedConversation({ selectedConversation: conversation })
+        );
+      }}
       sx={{
         width: "100%",
+
         borderRadius: 1,
-        backgroundColor:
-          theme.palette.mode === "light"
-            ? "#fff"
-            : theme.palette.background.alt,
+
+        backgroundColor: isSelected
+          ? theme.palette.primary.main
+          : theme.palette.background.alt,
       }}
       p={2}
     >
@@ -63,13 +84,18 @@ export const ChatElement = ({ img, name, msg, time, unread, online, id }) => {
               anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               variant="dot"
             >
-              <Avatar src={img} />
+              <Avatar src={picturePath} />
             </StyledBadge>
           ) : (
-            <Avatar src={img} />
+            <Avatar src={picturePath} />
           )}
           <Stack spacing={0.3}>
-            <Typography variant="subtitle2">{name}</Typography>
+            <Typography
+              variant="subtitle2"
+              // color={isSelected ? "black" : "white"}
+            >
+              {name}
+            </Typography>
             <Typography variant="caption">{msg}</Typography>
           </Stack>
         </Stack>
@@ -80,6 +106,6 @@ export const ChatElement = ({ img, name, msg, time, unread, online, id }) => {
           <Badge color="primary" badgeContent={unread}></Badge>
         </Stack>
       </Stack>
-    </Box>
+    </StyledChatBox>
   );
 };

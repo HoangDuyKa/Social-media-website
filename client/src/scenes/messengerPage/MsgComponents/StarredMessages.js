@@ -2,7 +2,7 @@ import { Box, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { CaretLeft } from "phosphor-react";
-import { updateRightBarType } from "State";
+import { updateRightBarType } from "Redux/Slice/app";
 import Message from "./Message";
 
 const StarredMessages = () => {

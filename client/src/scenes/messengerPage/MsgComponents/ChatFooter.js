@@ -23,6 +23,8 @@ import {
 } from "phosphor-react";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import { useSelector } from "react-redux";
+import { setMessages } from "Redux/Slice/conversation";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "&.MuiInputBase-input": {
@@ -64,11 +66,12 @@ const Actions = [
   },
 ];
 
-const ChatInput = ({ setOpenPicker }) => {
+const ChatInput = ({ setOpenPicker, setMessage }) => {
   const [openActions, setOpenActions] = useState(false);
 
   return (
     <StyledInput
+      onChange={(e) => setMessage(e.target.value)}
       fullWidth
       placeholder="Write a message..."
       variant="filled"
@@ -126,6 +129,36 @@ const ChatInput = ({ setOpenPicker }) => {
 const ChatFooter = () => {
   const theme = useTheme();
   const [openPicker, setOpenPicker] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const { messages, selectedConversation } = useSelector(
+    (state) => state.conversation
+  );
+  const token = useSelector((state) => state.auth.token);
+
+  const sendMessage = async (message) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/messages/send/${selectedConversation._id}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ message }),
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      setMessages([...messages, data]);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleSendMessage = () => {
+    sendMessage(message);
+    setMessage("");
+  };
 
   return (
     <Box
@@ -158,7 +191,7 @@ const ChatFooter = () => {
           />
         </Box>
         {/* Chat Input */}
-        <ChatInput setOpenPicker={setOpenPicker} />
+        <ChatInput setOpenPicker={setOpenPicker} setMessage={setMessage} />
 
         <Box
           sx={{
@@ -176,7 +209,7 @@ const ChatFooter = () => {
               justifyContent: "center",
             }}
           >
-            <IconButton>
+            <IconButton onClick={handleSendMessage}>
               <PaperPlaneTilt color="#fff" />
             </IconButton>
           </Stack>

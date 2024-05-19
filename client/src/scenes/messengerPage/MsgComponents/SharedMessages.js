@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { CaretLeft } from "phosphor-react";
 import { faker } from "@faker-js/faker";
-import { updateRightBarType } from "State";
+import { updateRightBarType } from "Redux/Slice/app";
 import { Shared_docs, Shared_links } from "data";
 import { DocMsg, LinkMsg } from "./MsgTypes";
 

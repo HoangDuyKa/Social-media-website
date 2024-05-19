@@ -12,7 +12,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setLogin } from "State";
+import { setLogin } from "Redux/Slice/auth";
 import Dropzone from "react-dropzone";
 import FlexBetween from "components/FlexBetween";
 
@@ -112,6 +112,7 @@ const Form = () => {
           token: loggedIn.token,
         })
       );
+      window.localStorage.setItem("user_id", loggedIn.user._id);
       navigate("/");
     }
   };
