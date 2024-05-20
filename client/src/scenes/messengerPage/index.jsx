@@ -122,6 +122,7 @@ function Messenger() {
                 {Nav_Setting.map((el) => {
                   return el.index === selected ? (
                     <Box
+                      key={el.index}
                       sx={{
                         backgroundColor: theme.palette.primary.main,
                         borderRadius: 1.5,

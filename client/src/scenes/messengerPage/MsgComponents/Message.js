@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   DocMsg,
   LinkMsg,
@@ -9,7 +9,10 @@ import {
   Timeline,
 } from "./MsgTypes";
 import { useDispatch, useSelector } from "react-redux";
-import { setMessages } from "Redux/Slice/conversation";
+import {  setMessages } from "Redux/Slice/conversation";
+import notificationSound from "assets/sounds/notification.mp3";
+import { useSocketContext } from "SocketContext";
+
 // import { Chat_History } from "data";
 
 const Message = ({ menu }) => {
@@ -18,7 +21,9 @@ const Message = ({ menu }) => {
   );
   const token = useSelector((state) => state.auth.token);
 
+  const lastMessageRef = useRef();
   const dispatch = useDispatch();
+  let Chat_History = messages
 
   // console.log(messages, selectedConversation);
 
@@ -33,6 +38,7 @@ const Message = ({ menu }) => {
           }
         );
         const data = await res.json();
+        console.log(data);
         if (data.error) throw new Error(data.error);
         dispatch(setMessages({ messages: data }));
       } catch (error) {
@@ -44,7 +50,29 @@ const Message = ({ menu }) => {
     if (selectedConversation?._id) getMessages();
   }, [selectedConversation?._id, setMessages]);
 
-  let Chat_History = messages;
+
+
+  useEffect(() => {
+    setTimeout(() => {
+      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, [messages]);
+
+  const { socket } = useSocketContext();
+
+	useEffect(() => {
+		socket?.on("newMessage", (newMessage) => {
+			// newMessage.shouldShake = true;
+			const sound = new Audio(notificationSound);
+			sound.play();
+      // let newMessages = Object.assign({}, [...messages, newMessage]);
+      let newMessages = [...messages, newMessage];
+      console.log(newMessages);
+      dispatch(setMessages({ messages: newMessages }));
+		});
+
+		return () => socket?.off("newMessage");
+	}, [socket, setMessages, messages]);
 
   console.log(messages);
 
@@ -54,7 +82,7 @@ const Message = ({ menu }) => {
         {Chat_History.map((el) => {
           switch (el.type) {
             case "divider":
-              return <Timeline el={el} />;
+              return <Timeline key={el._id} el={el} />;
             case "msg":
               switch (el.subtype) {
                 case "doc":
@@ -67,7 +95,7 @@ const Message = ({ menu }) => {
                   return <ReplyMsg el={el} />;
                 default:
                   // text msg
-                  return <TextMsg el={el} memu={menu} />;
+                  return <TextMsg key={el._id} el={el} memu={menu} ref={lastMessageRef} />;
               }
 
             default:

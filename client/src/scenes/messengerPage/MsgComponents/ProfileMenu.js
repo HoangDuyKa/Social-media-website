@@ -62,8 +62,8 @@ const ProfileMenu = () => {
         <Box p={1}>
           <Stack spacing={1}>
             {Profile_Menu.map((el, idx) => (
-              <MenuItem onClick={handleClose}>
-                <Stack
+              <MenuItem key={el.title} onClick={handleClose}>
+                <Stack key={el.title}
                   onClick={() => {
                     if (idx === 0) {
                       navigate("/profile");

@@ -51,7 +51,7 @@ export const ChatElement = ({
   const selectedConversation = useSelector(
     (state) => state.conversation.selectedConversation
   );
-  const isSelected = selectedConversation._id === _id;
+  const isSelected = selectedConversation?._id === _id;
   // console.log(selectedConversation);
 
   return (

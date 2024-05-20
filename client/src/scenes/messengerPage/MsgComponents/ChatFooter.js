@@ -86,8 +86,9 @@ const ChatInput = ({ setOpenPicker, setMessage }) => {
               }}
             >
               {Actions.map((el) => (
-                <Tooltip placement="right" title={el.title}>
+                <Tooltip placement="right" key={el.title} title={el.title}>
                   <Fab
+                  
                     sx={{
                       position: "absolute",
                       top: -el.y,
