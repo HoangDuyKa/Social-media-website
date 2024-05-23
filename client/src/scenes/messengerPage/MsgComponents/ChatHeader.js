@@ -12,11 +12,18 @@ import { faker } from "@faker-js/faker";
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from "phosphor-react";
 import StyledBadge from "components/StyledBadge";
 import { toggleRightbar } from "Redux/Slice/app";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ChatHeader = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const { current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+  // const fullName = `${current_conversation?.firstName} ${current_conversation?.lastName}`;
+  const onlineUsers = useSelector((state) => state.app.onlineUsers);
+
+  const online = onlineUsers.includes(current_conversation?.user_id);
   return (
     <Box
       p={2}
@@ -43,17 +50,31 @@ const ChatHeader = () => {
           onClick={() => dispatch(toggleRightbar())}
         >
           <Box>
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              variant="dot"
-            >
-              <Avatar src={faker.image.avatar()} alt={faker.name.fullName()} />
-            </StyledBadge>
+            {online ? (
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
+              >
+                <Avatar
+                  src={current_conversation?.img}
+                  alt={current_conversation?.name}
+                />
+              </StyledBadge>
+            ) : (
+              <Avatar
+                src={current_conversation?.img}
+                alt={current_conversation?.name}
+              />
+            )}
           </Box>
           <Stack spacing={0.2} direction={"column"}>
-            <Typography variant="subtitle2">{faker.name.fullName()}</Typography>
-            <Typography variant="caption">Online</Typography>
+            <Typography variant="subtitle2">
+              {current_conversation?.name}
+            </Typography>
+            <Typography variant="caption">
+              {online ? "Online" : "Offline"}
+            </Typography>
           </Stack>
         </Stack>
         <Stack direction={"row"} alignItems={"center"} spacing={3}>

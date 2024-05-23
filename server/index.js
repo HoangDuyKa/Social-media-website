@@ -18,18 +18,21 @@ import cloudinary from "./configs/cloudinary.js";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { app, server } from "./socket/socket.js";
 import connectToMongoDB from "./configs/db.js";
+import { sendMessage } from "./controllers/message.js";
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
-app.use(express.json());
+app.use(express.json({ extended: true }));
+app.use(express.urlencoded({ limit: "30mb", extended: true }));
+
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
 // app.use(morgan("common"));
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+// app.use(bodyParser.json({ limit: "30mb", extended: true }));
+// app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
@@ -64,9 +67,19 @@ const upload = multer({ storage: storage });
 /* ROUTES WITH FILES */
 app.post("/auth/register", upload.single("picture"), register);
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
+// app.post("/messages/send/:id", verifyToken, sendMessage);
 
 // /* ROUTES */
 app.use("/", Router);
+// import authRoutes from "./routes/auth.js";
+// import userRoutes from "./routes/users.js";
+// import postRoutes from "./routes/posts.js";
+// import messageRoutes from "./routes/message.js";
+
+// app.use("/auth", authRoutes);
+// app.use("/users", userRoutes);
+// app.use("/posts", postRoutes);
+// app.use("/messages", messageRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 5000;

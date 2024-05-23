@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Box,
   Fab,
@@ -23,8 +23,8 @@ import {
 } from "phosphor-react";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
-import { useSelector } from "react-redux";
-import { setMessages } from "Redux/Slice/conversation";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentMessages } from "Redux/Slice/conversation";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "&.MuiInputBase-input": {
@@ -66,12 +66,14 @@ const Actions = [
   },
 ];
 
-const ChatInput = ({ setOpenPicker, setMessage }) => {
+const ChatInput = ({ setOpenPickerr, setMessage, message, inputRef }) => {
   const [openActions, setOpenActions] = useState(false);
 
   return (
     <StyledInput
-      onChange={(e) => setMessage(e.target.value)}
+      onChange={setMessage}
+      value={message}
+      inputRef={inputRef}
       fullWidth
       placeholder="Write a message..."
       variant="filled"
@@ -88,7 +90,6 @@ const ChatInput = ({ setOpenPicker, setMessage }) => {
               {Actions.map((el) => (
                 <Tooltip placement="right" key={el.title} title={el.title}>
                   <Fab
-                  
                     sx={{
                       position: "absolute",
                       top: -el.y,
@@ -115,7 +116,7 @@ const ChatInput = ({ setOpenPicker, setMessage }) => {
           <InputAdornment>
             <IconButton
               onClick={() => {
-                setOpenPicker((pre) => !pre);
+                setOpenPickerr((pre) => !pre);
               }}
             >
               <Smiley />
@@ -131,33 +132,68 @@ const ChatFooter = () => {
   const theme = useTheme();
   const [openPicker, setOpenPicker] = useState(false);
   const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
+  const inputRef = useRef(null);
 
-  const { messages, selectedConversation } = useSelector(
-    (state) => state.conversation
+  function handleEmojiClick(emoji) {
+    const input = inputRef.current;
+
+    if (input) {
+      const selectionStart = input.selectionStart;
+      const selectionEnd = input.selectionEnd;
+
+      setMessage(
+        message.substring(0, selectionStart) +
+          emoji +
+          message.substring(selectionEnd)
+      );
+
+      // Move the cursor to the end of the inserted emoji
+      input.selectionStart = input.selectionEnd = selectionStart + 1;
+    }
+  }
+
+  const { current_messages, current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
   );
   const token = useSelector((state) => state.auth.token);
 
-  const sendMessage = async (message) => {
+  const sendMessage = async (message, type) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/messages/send/${selectedConversation._id}`,
+        `http://localhost:3001/messages/send/${current_conversation.user_id}`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ message }),
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message, type }),
         }
       );
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      setMessages([...messages, data]);
+      dispatch(
+        setCurrentMessages({ current_messages: [...current_messages, data] })
+      );
     } catch (error) {
       console.log(error.message);
     }
   };
+  const handleChangeMessage = (e) => {
+    setMessage(e.target.value);
+  };
 
-  const handleSendMessage = () => {
-    sendMessage(message);
+  function containsUrl(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return urlRegex.test(text);
+  }
+
+  const handleSendMessage = async () => {
+    const type = containsUrl(message) ? "Link" : "Text";
+    if (!message) return;
+    await sendMessage(message, type);
     setMessage("");
   };
 
@@ -188,11 +224,19 @@ const ChatFooter = () => {
           <Picker
             theme={theme.palette.mode}
             data={data}
-            onEmojiSelect={console.log}
+            onEmojiSelect={(emoji) => {
+              handleEmojiClick(emoji.native);
+            }}
           />
         </Box>
         {/* Chat Input */}
-        <ChatInput setOpenPicker={setOpenPicker} setMessage={setMessage} />
+        <ChatInput
+          setOpenPickerr={setOpenPicker}
+          setMessage={handleChangeMessage}
+          message={message}
+          inputRef={inputRef}
+          openPicker={openPicker}
+        />
 
         <Box
           sx={{

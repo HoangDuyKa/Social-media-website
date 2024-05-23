@@ -7,7 +7,7 @@ import {
   Delete,
   Message,
 } from "@mui/icons-material";
-import { Box, Typography, Divider, useTheme } from "@mui/material";
+import { Box, Typography, Divider, useTheme, IconButton } from "@mui/material";
 import UserImage from "components/UserImage";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
@@ -15,8 +15,17 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FriendListWidget from "./FriendListWidget";
+import Friends from "scenes/Dialog/FriendsDialog";
 
 const UserWidget = ({ userId, picturePath }) => {
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -53,65 +62,80 @@ const UserWidget = ({ userId, picturePath }) => {
   } = user;
 
   return (
-    <WidgetWrapper>
-      {/* FIRST ROW */}
-      <FlexBetween
-        gap="0.5rem"
-        pb="1.1rem"
-        onClick={() => navigate(`/profile/${userId}`)}
-      >
-        <FlexBetween gap="1rem">
-          <UserImage image={picturePath} />
-          <Box>
-            <Typography
-              variant="h4"
-              color={dark}
-              fontWeight="500"
+    <>
+      <WidgetWrapper>
+        {/* FIRST ROW */}
+        <FlexBetween
+          gap="0.5rem"
+          pb="1.1rem"
+          onClick={() => navigate(`/profile/${userId}`)}
+        >
+          <FlexBetween gap="1rem">
+            <UserImage image={picturePath} />
+            <Box>
+              <Typography
+                variant="h4"
+                color={dark}
+                fontWeight="500"
+                sx={{
+                  "&:hover": {
+                    color: palette.primary.light,
+                    cursor: "pointer",
+                  },
+                }}
+              >
+                {firstName} {lastName}
+              </Typography>
+              <Typography color={medium}>{friends.length} friends</Typography>
+            </Box>
+          </FlexBetween>
+          <ManageAccountsOutlined />
+        </FlexBetween>
+
+        <Divider />
+
+        {/* SECOND ROW */}
+        <Box p="1rem 0">
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <Group fontSize="large" sx={{ color: dark }} />
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Friends
+            </Typography>
+          </Box>
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <IconButton
+              onClick={() => {
+                handleOpenDialog();
+              }}
               sx={{
-                "&:hover": {
-                  color: palette.primary.light,
-                  cursor: "pointer",
-                },
+                p: 0,
+                width: "max-content",
               }}
             >
-              {firstName} {lastName}
+              <Message fontSize="large" sx={{ color: dark }} />
+            </IconButton>
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Messenger
             </Typography>
-            <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
-        </FlexBetween>
-        <ManageAccountsOutlined />
-      </FlexBetween>
-
-      <Divider />
-
-      {/* SECOND ROW */}
-      <Box p="1rem 0">
-        <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-          <Group fontSize="large" sx={{ color: main }} />
-          <Typography sx={{ fontSize: "1rem" }} color={medium}>
-            Friends
-          </Typography>
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <Delete fontSize="large" sx={{ color: dark }} />
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Trash
+            </Typography>
+          </Box>
         </Box>
-        <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-          <Message fontSize="large" sx={{ color: main }} />
-          <Typography sx={{ fontSize: "1rem" }} color={medium}>
-            Messenger
-          </Typography>
-        </Box>
-        <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-          <Delete fontSize="large" sx={{ color: main }} />
-          <Typography sx={{ fontSize: "1rem" }} color={medium}>
-            Trash
-          </Typography>
-        </Box>
-      </Box>
 
-      <Divider sx={{ marginBottom: "1rem" }} />
-      <FriendListWidget
-        style={{ padding: 0, marginTop: "5px" }}
-        userId={userId}
-      />
-    </WidgetWrapper>
+        <Divider sx={{ marginBottom: "1rem" }} />
+        <FriendListWidget
+          style={{ padding: 0, marginTop: "5px" }}
+          userId={userId}
+        />
+      </WidgetWrapper>
+      {openDialog && (
+        <Friends open={openDialog} handleClose={handleCloseDialog} />
+      )}
+    </>
   );
 };
 

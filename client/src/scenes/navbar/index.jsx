@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   IconButton,
@@ -26,7 +26,9 @@ import { setMode } from "Redux/Slice/app";
 import { setLogout } from "Redux/Slice/auth";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
+import { useSocketContext } from "SocketContext";
 // import UserImage from "components/UserImage";
+import notificationSound from "assets/sounds/notification.mp3";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -43,6 +45,18 @@ const Navbar = () => {
   const alt = theme.palette.background.alt;
 
   const fullName = `${user.firstName} ${user.lastName}`;
+
+  const { socket } = useSocketContext();
+
+  useEffect(() => {
+    socket?.on("newMessage", (newMessage) => {
+      // newMessage.shouldShake = true;
+      const sound = new Audio(notificationSound);
+      sound.play();
+    });
+
+    return () => socket?.off("newMessage");
+  }, [socket]);
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -87,7 +101,7 @@ const Navbar = () => {
             )}
           </IconButton>
           <IconButton onClick={() => navigate("/messages")}>
-            <Message sx={{ fontSize: "25px" }} />
+            <Message sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
           <Notifications sx={{ fontSize: "25px" }} />
           <Help sx={{ fontSize: "25px" }} />

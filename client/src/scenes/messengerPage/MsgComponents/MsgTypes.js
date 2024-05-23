@@ -15,7 +15,6 @@ import { useState } from "react";
 
 const user_id = window.localStorage.getItem("user_id");
 
-
 const LinkMsg = ({ el }) => {
   const theme = useTheme();
   return (
@@ -193,10 +192,9 @@ const MediaMsg = ({ el }) => {
 
 const TextMsg = ({ el, menu }) => {
   const theme = useTheme();
-  const receiver = el.receiverId ===user_id
-  const placement = el.receiverId ===user_id ? "left" : "right";
+  const receiver = el.receiverId === user_id;
+  const placement = el.receiverId === user_id ? "left" : "right";
   // const placement = el.incoming ? "left" : "right";
-  
 
   return receiver ? (
     <Stack direction={"row"} justifyContent={receiver ? "start" : "end"}>
@@ -217,11 +215,11 @@ const TextMsg = ({ el, menu }) => {
           {el.message}
         </Typography>
       </Box>
-      { <MessageOption placement={placement} />}
+      {<MessageOption placement={placement} />}
     </Stack>
   ) : (
     <Stack direction={"row"} justifyContent={receiver ? "start" : "end"}>
-      { <MessageOption placement={placement} />}
+      {<MessageOption placement={placement} />}
 
       <Box
         p={1.5}

@@ -14,11 +14,21 @@ const messageSchema = new mongoose.Schema(
     },
     message: {
       type: String,
-      required: true,
     },
     type: {
       type: String,
-      required: true,
+      enum: ["Text", "Media", "Document", "Link"],
+    },
+    created_at: {
+      type: Date,
+      default: Date.now(),
+    },
+    // text: {
+    //   type: String,
+    //   required: true,
+    // },
+    file: {
+      type: String,
     },
     // createdAt, updatedAt
   },

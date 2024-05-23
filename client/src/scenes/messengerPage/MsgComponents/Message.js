@@ -9,21 +9,21 @@ import {
   Timeline,
 } from "./MsgTypes";
 import { useDispatch, useSelector } from "react-redux";
-import {  setMessages } from "Redux/Slice/conversation";
+import { setCurrentMessages } from "Redux/Slice/conversation";
 import notificationSound from "assets/sounds/notification.mp3";
 import { useSocketContext } from "SocketContext";
 
 // import { Chat_History } from "data";
 
-const Message = ({ menu }) => {
-  const { messages, selectedConversation } = useSelector(
-    (state) => state.conversation
+const Message = ({ menu, nonedisplay }) => {
+  const { current_messages, current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
   );
   const token = useSelector((state) => state.auth.token);
 
   const lastMessageRef = useRef();
   const dispatch = useDispatch();
-  let Chat_History = messages
+  let Chat_History = current_messages;
 
   // console.log(messages, selectedConversation);
 
@@ -31,52 +31,60 @@ const Message = ({ menu }) => {
     const getMessages = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/messages/${selectedConversation._id}`,
+          `http://localhost:3001/messages/${current_conversation.user_id}`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
           }
         );
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
         if (data.error) throw new Error(data.error);
-        dispatch(setMessages({ messages: data }));
+        dispatch(setCurrentMessages({ current_messages: data }));
       } catch (error) {
         console.log(error.message);
       } finally {
       }
     };
 
-    if (selectedConversation?._id) getMessages();
-  }, [selectedConversation?._id, setMessages]);
-
-
+    if (current_conversation?.user_id) getMessages();
+  }, [current_conversation?.user_id, setCurrentMessages]);
 
   useEffect(() => {
     setTimeout(() => {
       lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
-  }, [messages]);
+  }, [current_messages]);
 
   const { socket } = useSocketContext();
 
-	useEffect(() => {
-		socket?.on("newMessage", (newMessage) => {
-			// newMessage.shouldShake = true;
-			const sound = new Audio(notificationSound);
-			sound.play();
+  useEffect(() => {
+    socket?.on("newMessage", (newMessage) => {
+      // newMessage.shouldShake = true;
+      if (!document.hasFocus()) {
+        const sound = new Audio(notificationSound);
+        sound.play();
+      }
       // let newMessages = Object.assign({}, [...messages, newMessage]);
-      let newMessages = [...messages, newMessage];
-      console.log(newMessages);
-      dispatch(setMessages({ messages: newMessages }));
-		});
+      let newMessages = [...current_messages, newMessage];
+      // console.log(newMessages);
+      if (
+        current_conversation?.user_id === newMessage.senderId ||
+        current_conversation === null
+      ) {
+        dispatch(setCurrentMessages({ current_messages: newMessages }));
+      } else {
+        dispatch(setCurrentMessages({ current_messages }));
+        // dispatch(setCurrentMessages({ current_messages }));
+      }
+    });
 
-		return () => socket?.off("newMessage");
-	}, [socket, setMessages, messages]);
+    return () => socket?.off("newMessage");
+  }, [socket, setCurrentMessages, current_messages]);
 
-  console.log(messages);
+  // console.log(messages);
 
-  return (
+  return !nonedisplay ? (
     <Box m={3}>
       <Stack spacing={3}>
         {Chat_History.map((el) => {
@@ -95,7 +103,11 @@ const Message = ({ menu }) => {
                   return <ReplyMsg el={el} />;
                 default:
                   // text msg
-                  return <TextMsg key={el._id} el={el} memu={menu} ref={lastMessageRef} />;
+                  return (
+                    <div key={el._id} ref={lastMessageRef}>
+                      <TextMsg el={el} memu={menu} />
+                    </div>
+                  );
               }
 
             default:
@@ -104,6 +116,8 @@ const Message = ({ menu }) => {
         })}
       </Stack>
     </Box>
+  ) : (
+    <></>
   );
 };
 
