@@ -97,12 +97,6 @@ const UserWidget = ({ userId, picturePath }) => {
         {/* SECOND ROW */}
         <Box p="1rem 0">
           <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-            <Group fontSize="large" sx={{ color: dark }} />
-            <Typography sx={{ fontSize: "1rem" }} color={medium}>
-              Friends
-            </Typography>
-          </Box>
-          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
             <IconButton
               onClick={() => {
                 handleOpenDialog();
@@ -112,8 +106,15 @@ const UserWidget = ({ userId, picturePath }) => {
                 width: "max-content",
               }}
             >
-              <Message fontSize="large" sx={{ color: dark }} />
+              <Group fontSize="large" sx={{ color: dark }} />
             </IconButton>
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Friends
+            </Typography>
+          </Box>
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <Message fontSize="large" sx={{ color: dark }} />
+
             <Typography sx={{ fontSize: "1rem" }} color={medium}>
               Messenger
             </Typography>

@@ -55,7 +55,6 @@ const Chats = () => {
     socket.emit("get_direct_conversations", { user_id }, (data) => {
       // console.log(data); // this data is the list of conversations
       // dispatch action
-
       dispatch(FetchDirectConversations({ conversations: data }));
     });
   }, [current_messages]);

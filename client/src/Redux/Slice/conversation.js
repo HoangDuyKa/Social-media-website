@@ -38,17 +38,6 @@ export const conversationSlice = createSlice({
           (elm) => elm._id.toString() !== user_id
         );
         return {
-          // id: el._id,
-          // user_id: user?._id,
-          // name: `${user?.firstName} ${user?.lastName}`,
-          // online: user?.status === "Online",
-          // img: faker.image.image(),
-          // msg: el.text ? el.messages.slice(-1)[0].text : "",
-          // time: "9:36",
-          // unread: 0,
-          // pinned: false,
-          // about: user?.about,
-
           id: el._id,
           user_id: user?._id,
           name: `${user?.firstName} ${user?.lastName}`,
@@ -56,27 +45,7 @@ export const conversationSlice = createSlice({
           img: user.picturePath,
           msg: el.messages ? el.messages.slice(-1)[0].message : "",
           time: "9:36",
-          unread: action.payload.unread,
-          pinned: false,
-          about: user?.about,
-        };
-      });
-      state.direct_chat.conversations = list;
-    },
-    setUnreadConversation(state, action) {
-      const list = action.payload.conversations.map((el) => {
-        const user = el.participants.find(
-          (elm) => elm._id.toString() !== user_id
-        );
-        return {
-          id: el._id,
-          user_id: user?._id,
-          name: `${user?.firstName} ${user?.lastName}`,
-          online: user?.status === "Online",
-          img: user.picturePath,
-          msg: el.messages ? el.messages.slice(-1)[0].message : "",
-          time: "9:36",
-          unread: 1,
+          unread: user.unread ? user.unread : 0,
           pinned: false,
           about: user?.about,
         };
@@ -150,36 +119,19 @@ export const conversationSlice = createSlice({
     },
   },
 });
-export const {
-  setSelectedConversation,
-  setCurrentMessages,
-  updateDirectConversation,
-  setUnreadConversation,
-} = conversationSlice.actions;
+export const { setCurrentMessages } = conversationSlice.actions;
 
 export default conversationSlice.reducer;
 
-export const SetSelectedConversation = ({ conversation }) => {
-  return async (dispatch, getState) => {
-    dispatch(
-      conversationSlice.actions.setSelectedConversation({ conversation })
-    );
-  };
-};
-
-export const SetMessages = ({ messages }) => {
-  return async (dispatch, getState) => {
-    dispatch(conversationSlice.actions.setMessages({ messages }));
-  };
-};
-
 export const FetchDirectConversations = ({ conversations }) => {
   return async (dispatch, getState) => {
+    // console.log(getState().conversation.direct_chat);
     dispatch(
       conversationSlice.actions.fetchDirectConversations({ conversations })
     );
   };
 };
+
 export const AddDirectConversation = ({ conversation }) => {
   return async (dispatch, getState) => {
     dispatch(conversationSlice.actions.addDirectConversation({ conversation }));

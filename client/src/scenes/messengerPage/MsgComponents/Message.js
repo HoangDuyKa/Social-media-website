@@ -9,19 +9,22 @@ import {
   Timeline,
 } from "./MsgTypes";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentMessages } from "Redux/Slice/conversation";
+import {
+  FetchDirectConversations,
+  setCurrentMessages,
+} from "Redux/Slice/conversation";
 import notificationSound from "assets/sounds/notification.mp3";
 import { useSocketContext } from "SocketContext";
 
 // import { Chat_History } from "data";
 
 const Message = ({ menu, nonedisplay }) => {
-  const { current_messages, current_conversation } = useSelector(
+  const { current_messages, current_conversation, conversations } = useSelector(
     (state) => state.conversation.direct_chat
   );
   const token = useSelector((state) => state.auth.token);
 
-  const lastMessageRef = useRef();
+  // const lastMessageRef = useRef();
   const dispatch = useDispatch();
   let Chat_History = current_messages;
 
@@ -40,6 +43,7 @@ const Message = ({ menu, nonedisplay }) => {
         const data = await res.json();
         // console.log(data);
         if (data.error) throw new Error(data.error);
+        console.log(data);
         dispatch(setCurrentMessages({ current_messages: data }));
       } catch (error) {
         console.log(error.message);
@@ -50,18 +54,18 @@ const Message = ({ menu, nonedisplay }) => {
     if (current_conversation?.user_id) getMessages();
   }, [current_conversation?.user_id, setCurrentMessages]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  }, [current_messages]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+  //   }, 100);
+  // }, [current_messages]);
 
   const { socket } = useSocketContext();
 
   useEffect(() => {
     socket?.on("newMessage", (newMessage) => {
       // newMessage.shouldShake = true;
-      if (!document.hasFocus()) {
+      if (!document.hasFocus() || document.hasFocus()) {
         const sound = new Audio(notificationSound);
         sound.play();
       }
@@ -75,7 +79,20 @@ const Message = ({ menu, nonedisplay }) => {
         dispatch(setCurrentMessages({ current_messages: newMessages }));
       } else {
         dispatch(setCurrentMessages({ current_messages }));
-        // dispatch(setCurrentMessages({ current_messages }));
+        // if(conversations.unread){
+
+        // }
+        // let arrayConversations = [...conversations];
+        // let newConversationss = arrayConversations.map((conversation) => {
+        //   if (conversation.user_id !== current_conversation?.user_id) {
+        //     // conversation.unread += 1;
+        //     Object.assign(conversation, { unread: 1 });
+        //     console.log(conversation);
+        //   }
+        //   return conversation;
+        // });
+        // console.log(newConversationss);
+        // // dispatch(FetchDirectConversations({conversations: conversations}))
       }
     });
 
@@ -104,9 +121,9 @@ const Message = ({ menu, nonedisplay }) => {
                 default:
                   // text msg
                   return (
-                    <div key={el._id} ref={lastMessageRef}>
-                      <TextMsg el={el} memu={menu} />
-                    </div>
+                    // <div key={el._id} ref={lastMessageRef}>
+                    <TextMsg el={el} memu={menu} />
+                    //</div>
                   );
               }
 

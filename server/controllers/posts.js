@@ -4,12 +4,28 @@ import User from "../models/User.js";
 /* CREATE */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description } = req.body;
+    const { userId, description, fileType, fileName } = req.body;
+    // let fileUrl = "";
+    // console.log(req.files);
+    // if (req.files) {
+    //   if (req.files.picture) {
+    //     fileUrl = "image " + req.files.picture[0].path;
+    //   } else if (req.files.video) {
+    //     fileUrl = "video " + req.files.video[0].path;
+    //   } else if (req.files.file) {
+    //     fileUrl = "file " + req.files.file[0].path;
+    //   } else {
+    //     fileUrl = "noFile";
+    //   }
+    // }
 
-    let imageUrl = "noImage";
+    let filePath = "noFile";
     if (req.file) {
-      imageUrl = req.file.path;
+      filePath = req.file.path;
     }
+
+    console.log(req.file);
+    console.log(req.body);
     const user = await User.findById(userId);
     const newPost = new Post({
       userId,
@@ -18,7 +34,12 @@ export const createPost = async (req, res) => {
       location: user.location,
       description,
       userPicturePath: user.picturePath,
-      picturePath: imageUrl,
+      // picturePath: fileUrl,
+      file: {
+        path: filePath,
+        fileType: fileType,
+        fileName: fileName,
+      },
       likes: {},
       comments: [],
     });

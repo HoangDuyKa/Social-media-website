@@ -35,6 +35,7 @@ export const SocketContextProvider = ({ children }) => {
     } else {
       if (socket) {
         socket.close();
+        console.log("socket closed");
 
         setSocket(null);
       }

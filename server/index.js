@@ -55,18 +55,119 @@ app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "Posts",
-    allowedFormats: ["jpg", "png", "gif", "jpeg"],
-    transformation: [{ width: 500, height: 500, crop: "limit" }],
+  // params: async (req, file) => {
+  //   let folder, resource_type, public_id, fileExtension;
+  //   if (file.mimetype.startsWith("image/")) {
+  //     folder = "images";
+  //     resource_type = "image";
+  //     public_id = `image-${Date.now()}-${path.basename(
+  //       file.originalname,
+  //       path.extname(file.originalname)
+  //     )}`;
+  //   } else if (file.mimetype.startsWith("video/")) {
+  //     folder = "videos";
+  //     resource_type = "video";
+  //     public_id = `video-${Date.now()}-${path.basename(
+  //       file.originalname,
+  //       path.extname(file.originalname)
+  //     )}`;
+  //   } else {
+  //     // console.log(file.mimetype.split("/")[0]);
+  //     folder = "files";
+  //     resource_type = "auto";
+  //     fileExtension = path.extname(file.originalname).substring(1);
+  //     public_id = `file-${Date.now()}-${path.basename(
+  //       file.originalname,
+  //       path.extname(file.originalname)
+  //     )}`;
+  //     // throw new Error("Unsupported file type");
+  //   }
+  //   console.log("public_id", public_id);
+  //   return {
+  //     folder: folder,
+  //     resource_type: resource_type,
+  //     public_id: public_id,
+  //     format: fileExtension ? fileExtension : null,
+  //   };
+  // },
+  params: async (req, file) => {
+    // let folder = "files";
+    // let resource_type = "raw";
+    // console.log("start");
+
+    // const fileExtension = path.extname(file.originalname).substring(1); // Get file extension without the dot
+    // const format = fileExtension;
+    // const public_id = `file-${Date.now()}-${path.basename(
+    //   file.originalname,
+    //   path.extname(file.originalname)
+    // )}`;
+
+    // if (file.mimetype.startsWith("image/")) {
+    //   folder = "images";
+    //   resource_type = "image";
+    // } else if (file.mimetype.startsWith("video/")) {
+    //   folder = "videos";
+    //   resource_type = "video";
+    // } else if (file.mimetype.startsWith("audio/")) {
+    //   folder = "audio";
+    //   resource_type = "video";
+    // }
+    const folderMap = {
+      Image: "images",
+      Video: "videos",
+      Audio: "audio",
+      File: "files",
+    };
+    const resourceTypeMap = {
+      Image: "image",
+      Video: "video",
+      Audio: "video",
+      File: "raw",
+    };
+    const folder = folderMap[req.body.fileType] || "files";
+    const resource_type = resourceTypeMap[req.body.fileType] || "raw";
+
+    const fileExtension = path.extname(file.originalname).substring(1); // Get file extension without the dot
+    const public_id = `file-${Date.now()}-${path.basename(
+      file.originalname,
+      path.extname(file.originalname)
+    )}`;
+    const format = fileExtension ? fileExtension : null;
+    console.log("folder", folder);
+    console.log("resource_type", resource_type);
+    console.log("public_id", public_id);
+    console.log("format", format);
+
+    return {
+      folder: folder,
+      resource_type: resource_type,
+      public_id: public_id,
+      format: format, // Ensure the file extension is included in the URL
+    };
   },
 });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 100000000 }, // Limit file size to 100MB (adjust as needed)
+});
 
 /* ROUTES WITH FILES */
 app.post("/auth/register", upload.single("picture"), register);
-app.post("/posts", verifyToken, upload.single("picture"), createPost);
+// app.post("/posts", verifyToken, upload.single("picture"), createPost);
+app.post(
+  "/posts",
+  verifyToken,
+  // upload.fields([
+  //   { name: "picture", maxCount: 1 },
+  //   { name: "video", maxCount: 1 },
+  //   { name: "file", maxCount: 1 },
+  // ]),
+  upload.single("file"),
+  createPost
+);
 // app.post("/messages/send/:id", verifyToken, sendMessage);
 
 // /* ROUTES */

@@ -13,11 +13,18 @@ const Conversation = () => {
     (state) => state.conversation.direct_chat
   );
   const theme = useTheme();
-  // const messageListRef = useRef();
-  // useEffect(() => {
-  //   // Scroll to the bottom of the message list when new messages are added
-  //   messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
-  // }, [current_messages]);
+  const messageListRef = useRef();
+
+  useEffect(() => {
+    if (messageListRef.current) {
+      // //auto scrolling bottom with no animation
+      // messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+      messageListRef.current.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [current_messages]);
 
   return current_conversation ? (
     <Stack height={"100%"} maxHeight={"100vh"} width={"auto"}>
@@ -25,7 +32,7 @@ const Conversation = () => {
       <ChatHeader />
       {/* Msg */}
       <Box
-        // ref={messageListRef}
+        ref={messageListRef}
         width={"100%"}
         sx={{ flexGrow: 1, overflowY: "scroll", height: "100%" }}
       >

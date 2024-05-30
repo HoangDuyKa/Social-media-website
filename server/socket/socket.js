@@ -104,24 +104,6 @@ io.on("connection", async (socket) => {
     callback(existing_conversations);
   });
 
-  socket.on("update_direct_conversations", async ({ user_id }, callback) => {
-    const existing_conversations = await Conversation.find({
-      participants: { $all: [user_id] },
-    })
-      .populate(
-        "participants",
-        "firstName lastName picturePath _id email status"
-      )
-      .populate("messages", "message");
-    // console.log(user_id);
-
-    // db.books.find({ authors: { $elemMatch: { name: "John Smith" } } })
-
-    // console.log("haha", existing_conversations);
-
-    callback(existing_conversations);
-  });
-
   socket.on("start_conversation", async (data) => {
     // data: {to: from:}
 

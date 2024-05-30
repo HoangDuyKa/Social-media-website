@@ -1,13 +1,30 @@
 import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "../Redux/Slice/auth";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 import StyledBadge from "./StyledBadge";
+import { DotsThreeVertical } from "phosphor-react";
+import { useState } from "react";
 
-const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+const Friend = ({
+  friendId,
+  name,
+  subtitle,
+  userPicturePath,
+  isPost,
+  postUserId,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.auth.user);
@@ -80,17 +97,101 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
           </Typography>
         </Box>
       </FlexBetween>
-      <IconButton
-        onClick={() => patchFriend()}
-        sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-      >
-        {isFriend ? (
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
-        ) : (
-          <PersonAddOutlined sx={{ color: primaryDark }} />
-        )}
-      </IconButton>
+      {isPost ? (
+        <IconButton
+          // onClick={() => patchFriend()}
+          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+        >
+          <PostOption
+            sx={{ color: primaryDark }}
+            patchFriend={patchFriend}
+            isFriend={isFriend}
+            postUserId={postUserId}
+            _id={_id}
+          />
+        </IconButton>
+      ) : (
+        <IconButton
+          onClick={() => patchFriend()}
+          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+        >
+          {isFriend ? (
+            <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: primaryDark }} />
+          )}
+        </IconButton>
+      )}
     </FlexBetween>
+  );
+};
+
+const PostOption = ({ patchFriend, isFriend, postUserId, _id }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const Post_options =
+    postUserId !== _id
+      ? [
+          {
+            title: isFriend ? "Remove Friend" : "Add Friend",
+            handleClick: () => {
+              patchFriend().then(handleClose);
+            },
+          },
+          {
+            title: "Report",
+          },
+        ]
+      : [
+          {
+            title: "Set Status Post",
+          },
+          {
+            title: "Delete Post",
+          },
+        ];
+  return (
+    <>
+      <DotsThreeVertical
+        size={24}
+        id="basic-button"
+        aria-controls={open ? "basic-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        onClick={handleClick}
+        placement="left"
+        cursor={"pointer"}
+      />
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        getContentAnchorEl={null}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <Stack spacing={1} px={1}>
+          {Post_options.map((el) => (
+            <MenuItem
+              key={el.title}
+              onClick={el.handleClick ? el.handleClick : handleClose}
+            >
+              {el.title}
+            </MenuItem>
+          ))}
+        </Stack>
+      </Menu>
+    </>
   );
 };
 

@@ -11,6 +11,8 @@ import {
 import { styled, useTheme } from "@mui/material/styles";
 import { Chat } from "phosphor-react";
 import { useSocketContext } from "SocketContext";
+import { useDispatch, useSelector } from "react-redux";
+import { setFriends } from "Redux/Slice/auth";
 
 const user_id = window.localStorage.getItem("user_id");
 
@@ -109,10 +111,29 @@ const FriendRequestElement = ({
   online,
   picturePath,
   id,
+  _id,
 }) => {
   const theme = useTheme();
 
   const name = `${firstName} ${lastName}`;
+  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
+
+  const patchFriend = async () => {
+    const response = await fetch(
+      `http://localhost:3001/users/${user_id}/${_id}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    // console.log(data);
+    dispatch(setFriends({ friends: data }));
+  };
   const { socket } = useSocketContext();
   return (
     <StyledChatBox

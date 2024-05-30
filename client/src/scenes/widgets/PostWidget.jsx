@@ -18,17 +18,18 @@ const PostWidget = ({
   name,
   description,
   location,
-  picturePath,
+  file,
   userPicturePath,
   likes,
   comments,
 }) => {
   const [isComments, setIsComments] = useState(false);
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.token);
+  const token = useSelector((state) => state.auth.token);
   const loggedInUserId = useSelector((state) => state.auth.user._id);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
+  const time = "12 hours ago";
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
@@ -52,22 +53,93 @@ const PostWidget = ({
       <Friend
         friendId={postUserId}
         name={name}
-        subtitle={location}
+        // subtitle={location}
+        subtitle={time}
         userPicturePath={userPicturePath}
+        isPost
+        postUserId={postUserId}
       />
       <Typography color={main} sx={{ mt: "1rem" }}>
         {description}
       </Typography>
-      {picturePath && picturePath !== "noImage" && (
+      {/* {picturePath !== "noFile" && picturePath.split(" ")[0] === "image" && (
         <img
           width="100%"
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
           // src={`http://localhost:3001/assets/${picturePath}`}
-          src={picturePath}
+          src={picturePath.split(" ")[1]}
         />
       )}
+      {picturePath !== "noFile" && picturePath.split(" ")[0] === "video" && (
+        <video
+          width="100%"
+          height="auto"
+          alt="post"
+          controls
+          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+          // src={`http://localhost:3001/assets/${picturePath}`}
+        >
+          <source src={picturePath.split(" ")[1]}></source>
+        </video>
+      )} */}
+
+      {file.fileType === "Image" && (
+        <img
+          width="100%"
+          height="auto"
+          alt="post"
+          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+          src={file.path}
+        />
+      )}
+
+      {file.fileType === "Video" && (
+        <video
+          width="100%"
+          height="auto"
+          alt="post"
+          controls
+          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+        >
+          <source src={file.path}></source>
+        </video>
+      )}
+
+      {file.fileType === "File" && (
+        <div>
+          {/* <h3>Document Preview</h3> */}
+          <a href={file.path} target="_blank" rel="noopener noreferrer">
+            Open Document{" "}
+          </a>
+          {file.fileName}
+          <br />
+          <a href={file.path} download>
+            Download Document
+          </a>
+          {file.path.endsWith(".pdf") && (
+            <iframe
+              src={file.path}
+              // src="https://www.clickdimensions.com/links/TestPDFfile.pdf"
+              width="600"
+              height="400"
+              title="Document Preview"
+            ></iframe>
+          )}
+        </div>
+        // <div>
+        //   <h3>Document Preview</h3>
+        //   <a href={file.path} target="_blank" rel="noopener noreferrer">
+        //     Open Document
+        //   </a>
+        //   <br />
+        //   <a href={file.path} download>
+        //     Download Document
+        //   </a>
+        // </div>
+      )}
+
       <FlexBetween mt="0.25rem">
         <FlexBetween gap="1rem">
           <FlexBetween gap="0.3rem">
