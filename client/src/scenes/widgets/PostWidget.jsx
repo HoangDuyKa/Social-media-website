@@ -5,6 +5,8 @@ import {
   ShareOutlined,
 } from "@mui/icons-material";
 import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
+import { CommentProvider } from "commentContext";
+import Core from "components/CommentSection/Core";
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
@@ -22,11 +24,14 @@ const PostWidget = ({
   userPicturePath,
   likes,
   comments,
+  trashPosts,
 }) => {
   const [isComments, setIsComments] = useState(false);
+  const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
-  const loggedInUserId = useSelector((state) => state.auth.user._id);
+  const loggedInUser = useSelector((state) => state.auth.user);
+  const loggedInUserId = loggedInUser._id;
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const time = "12 hours ago";
@@ -48,16 +53,37 @@ const PostWidget = ({
     dispatch(setPost({ post: updatedPost }));
   };
 
+  const patchComment = async (commentText) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/comment`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentText,
+          UserComment: loggedInUser,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
+    dispatch(setPost({ post: updatedPost }));
+  };
+
   return (
-    <WidgetWrapper m="2rem 0">
+    <WidgetWrapper m={trashPosts ? "0 0 2rem" : "2rem 0"}>
       <Friend
         friendId={postUserId}
         name={name}
         // subtitle={location}
         subtitle={time}
         userPicturePath={userPicturePath}
-        isPost
+        // isPost={true}
         postUserId={postUserId}
+        postId={postId}
+        trashPosts={trashPosts}
       />
       <Typography color={main} sx={{ mt: "1rem" }}>
         {description}
@@ -110,22 +136,46 @@ const PostWidget = ({
       {file.fileType === "File" && (
         <div>
           {/* <h3>Document Preview</h3> */}
-          <a href={file.path} target="_blank" rel="noopener noreferrer">
+          <a
+            href={file.path}
+            target="_blank"
+            // download={file.fileName}
+            rel="noopener noreferrer"
+          >
             Open Document{" "}
           </a>
           {file.fileName}
           <br />
-          <a href={file.path} download>
+          {/* <a href={file.path} download={file.fileName}>
             Download Document
-          </a>
+          </a> */}
           {file.path.endsWith(".pdf") && (
-            <iframe
-              src={file.path}
-              // src="https://www.clickdimensions.com/links/TestPDFfile.pdf"
-              width="600"
-              height="400"
-              title="Document Preview"
-            ></iframe>
+            <div>
+              {/* <IconButton >
+                <ChatBubbleOutlineOutlined sx={{ color: primary }} />
+              </IconButton> */}
+              <Typography
+                sx={{
+                  "&:hover": {
+                    cursor: "pointer",
+                    color: palette.primary.light,
+                  },
+                }}
+                onClick={() => SetIsPreviewPDF(!isPreviewPDF)}
+              >
+                Preview file here
+              </Typography>
+              {isPreviewPDF && (
+                <iframe
+                  src={file.path}
+                  // src="https://www.clickdimensions.com/links/TestPDFfile.pdf"
+                  // width="840"
+                  width={"100%"}
+                  height="1000"
+                  title="Document Preview"
+                ></iframe>
+              )}
+            </div>
           )}
         </div>
         // <div>
@@ -138,6 +188,12 @@ const PostWidget = ({
         //     Download Document
         //   </a>
         // </div>
+      )}
+
+      {file.fileType === "Audio" && (
+        <audio controls>
+          <source src={file.path} />
+        </audio>
       )}
 
       <FlexBetween mt="0.25rem">
@@ -167,15 +223,19 @@ const PostWidget = ({
       </FlexBetween>
       {isComments && (
         <Box mt="0.5rem">
-          {comments.map((comment, i) => (
-            <Box key={`${name}-${i}`}>
-              <Divider />
-              <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-                {comment}
-              </Typography>
-            </Box>
-          ))}
-          <Divider />
+          {/* {comments.map((comment, i) => (
+            // <Box key={`${name}-${i}`}>
+            //   <Divider />
+            //   <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
+            //     {comment}
+            //   </Typography>
+            // </Box>
+            
+          ))} */}
+          {/* <Divider /> */}
+          <CommentProvider>
+            <Core patchComment={patchComment} postId={postId} />
+          </CommentProvider>
         </Box>
       )}
     </WidgetWrapper>

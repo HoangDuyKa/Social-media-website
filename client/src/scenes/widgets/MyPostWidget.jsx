@@ -380,9 +380,21 @@ const MyPostWidget = ({ picturePath }) => {
               </Typography>
             </FlexBetween>
 
-            <FlexBetween gap="0.25rem">
+            <FlexBetween
+              gap="0.25rem"
+              onClick={() =>
+                fileType === ""
+                  ? handleFileTypeChange("Audio")
+                  : setFileType("")
+              }
+            >
               <MicOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Audio</Typography>
+              <Typography
+                color={mediumMain}
+                sx={{ "&:hover": { cursor: "pointer", color: medium } }}
+              >
+                Audio
+              </Typography>
             </FlexBetween>
           </>
         ) : (

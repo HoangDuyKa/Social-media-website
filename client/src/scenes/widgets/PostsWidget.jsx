@@ -4,7 +4,7 @@ import { setPosts } from "Redux/Slice/app";
 import PostWidget from "./PostWidget";
 import { Stack, Typography, useTheme } from "@mui/material";
 
-const PostsWidget = ({ userId, isProfile = false }) => {
+const PostsWidget = ({ userId, isProfile = false, trashPosts = false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.app.posts);
   const token = useSelector((state) => state.auth.token);
@@ -31,10 +31,23 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
   };
+  const getUserTrash = async () => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${userId}/trash`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    dispatch(setPosts({ posts: data }));
+  };
 
   useEffect(() => {
     if (isProfile) {
       getUserPosts();
+    } else if (trashPosts) {
+      getUserTrash();
     } else {
       getPosts();
     }
@@ -77,6 +90,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               userPicturePath={userPicturePath}
               likes={likes}
               comments={comments}
+              trashPosts={trashPosts}
             />
           )
         )

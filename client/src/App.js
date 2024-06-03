@@ -40,6 +40,10 @@ function App() {
               path="/messages"
               element={isAuth ? <Messenger /> : <Navigate to="/login" />}
             />
+            <Route
+              path="/trash/:userId"
+              element={isAuth ? <TrashPost /> : <Navigate to="/login" />}
+            />
             <Route path="/404" element={<Page404 />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
@@ -54,5 +58,6 @@ const LoginPage = Loadable(lazy(() => import("scenes/loginPage")));
 const ProfilePage = Loadable(lazy(() => import("scenes/profilePage")));
 const Messenger = Loadable(lazy(() => import("scenes/messengerPage")));
 const Page404 = Loadable(lazy(() => import("scenes/404Page")));
+const TrashPost = Loadable(lazy(() => import("scenes/trashPostPage")));
 
 export default App;

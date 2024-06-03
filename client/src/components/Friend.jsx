@@ -1,4 +1,11 @@
-import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
+import {
+  Delete,
+  DeleteForever,
+  PersonAddOutlined,
+  PersonRemoveOutlined,
+  Public,
+  ReportGmailerrorred,
+} from "@mui/icons-material";
 import {
   Box,
   IconButton,
@@ -8,6 +15,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { Restore } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "../Redux/Slice/auth";
@@ -22,8 +30,10 @@ const Friend = ({
   name,
   subtitle,
   userPicturePath,
-  isPost,
+  // isPost,
   postUserId,
+  postId,
+  trashPosts,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -54,6 +64,49 @@ const Friend = ({
     // console.log(data);
     dispatch(setFriends({ friends: data }));
   };
+
+  const softDeletePost = async () => {
+    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+  };
+
+  const destroyPost = async () => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/force`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+  };
+
+  const restorePost = async () => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/restore`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+  };
+
   const onlineUsers = useSelector((state) => state.app.onlineUsers);
 
   const online = onlineUsers.includes(friendId);
@@ -97,10 +150,10 @@ const Friend = ({
           </Typography>
         </Box>
       </FlexBetween>
-      {isPost ? (
+      {postId ? (
         <IconButton
           // onClick={() => patchFriend()}
-          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+          sx={{ backgroundColor: primaryLight }}
         >
           <PostOption
             sx={{ color: primaryDark }}
@@ -108,6 +161,10 @@ const Friend = ({
             isFriend={isFriend}
             postUserId={postUserId}
             _id={_id}
+            trashPosts={trashPosts}
+            softDeletePost={softDeletePost}
+            destroyPost={destroyPost}
+            restorePost={restorePost}
           />
         </IconButton>
       ) : (
@@ -126,7 +183,17 @@ const Friend = ({
   );
 };
 
-const PostOption = ({ patchFriend, isFriend, postUserId, _id }) => {
+const PostOption = ({
+  patchFriend,
+  isFriend,
+  postUserId,
+  _id,
+  trashPosts,
+  softDeletePost,
+  destroyPost,
+  restorePost,
+}) => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -135,27 +202,50 @@ const PostOption = ({ patchFriend, isFriend, postUserId, _id }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const Post_options =
-    postUserId !== _id
-      ? [
-          {
-            title: isFriend ? "Remove Friend" : "Add Friend",
-            handleClick: () => {
-              patchFriend().then(handleClose);
-            },
+  const Post_options = trashPosts
+    ? [
+        {
+          title: "Restore Post",
+          handleClick: () => {
+            restorePost().then(navigate("/"));
           },
-          {
-            title: "Report",
+          icon: <Restore />,
+        },
+        {
+          title: "Delete Forever",
+          handleClick: () => {
+            destroyPost().then(handleClose);
           },
-        ]
-      : [
-          {
-            title: "Set Status Post",
+          icon: <DeleteForever />,
+        },
+      ]
+    : postUserId !== _id
+    ? [
+        {
+          title: isFriend ? "Remove Friend" : "Add Friend",
+          handleClick: () => {
+            patchFriend().then(handleClose);
           },
-          {
-            title: "Delete Post",
+          icon: isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />,
+        },
+        {
+          title: "Report",
+          icon: <ReportGmailerrorred />,
+        },
+      ]
+    : [
+        {
+          title: "Set Status Post",
+          icon: <Public />,
+        },
+        {
+          title: "Delete Post",
+          handleClick: () => {
+            softDeletePost().then(handleClose);
           },
-        ];
+          icon: <Delete />,
+        },
+      ];
   return (
     <>
       <DotsThreeVertical
@@ -186,7 +276,8 @@ const PostOption = ({ patchFriend, isFriend, postUserId, _id }) => {
               key={el.title}
               onClick={el.handleClick ? el.handleClick : handleClose}
             >
-              {el.title}
+              <Typography marginRight={"1rem"}>{el.title}</Typography>
+              <Box sx={{ position: "absolute", right: 0 }}>{el.icon}</Box>
             </MenuItem>
           ))}
         </Stack>

@@ -24,9 +24,12 @@ export const appSlice = createSlice({
     },
     setPost: (state, action) => {
       const updatedPosts = state.posts.map((post) => {
-        if (post._id === action.payload.post._id) return action.payload.post;
+        if (post._id === action.payload.post._id) {
+          return action.payload.post;
+        }
         return post;
       });
+      console.log(updatedPosts);
       state.posts = updatedPosts;
     },
     toggleRightbar: (state) => {

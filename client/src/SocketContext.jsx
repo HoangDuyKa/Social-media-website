@@ -31,10 +31,16 @@ export const SocketContextProvider = ({ children }) => {
         dispatch(setOnlineUsers({ onlineUsers: users }));
       });
 
-      return () => socket.close();
+      if (socket.readyState === 1) {
+        // <-- This is important
+        return () => socket.close();
+      }
     } else {
       if (socket) {
-        socket.close();
+        if (socket.readyState === 1) {
+          // <-- This is important
+          return () => socket.close();
+        }
         console.log("socket closed");
 
         setSocket(null);

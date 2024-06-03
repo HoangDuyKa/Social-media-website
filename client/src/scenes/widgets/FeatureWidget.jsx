@@ -6,6 +6,7 @@ import {
   Group,
   Delete,
   Message,
+  Home,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme, IconButton } from "@mui/material";
 import UserImage from "components/UserImage";
@@ -99,6 +100,22 @@ const UserWidget = ({ userId, picturePath }) => {
           <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
             <IconButton
               onClick={() => {
+                navigate("/");
+              }}
+              sx={{
+                p: 0,
+                width: "max-content",
+              }}
+            >
+              <Home fontSize="large" sx={{ color: dark }} />
+            </IconButton>
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Home
+            </Typography>
+          </Box>
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <IconButton
+              onClick={() => {
                 handleOpenDialog();
               }}
               sx={{
@@ -120,7 +137,18 @@ const UserWidget = ({ userId, picturePath }) => {
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-            <Delete fontSize="large" sx={{ color: dark }} />
+            <IconButton
+              onClick={() => {
+                navigate(`/trash/${userId}`);
+              }}
+              sx={{
+                p: 0,
+                width: "max-content",
+              }}
+            >
+              <Delete fontSize="large" sx={{ color: dark }} />
+            </IconButton>
+
             <Typography sx={{ fontSize: "1rem" }} color={medium}>
               Trash
             </Typography>
