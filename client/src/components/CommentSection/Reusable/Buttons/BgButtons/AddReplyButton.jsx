@@ -1,7 +1,13 @@
 import { Button } from "@mui/material";
 import React from "react";
 
-const AddReplyButton = ({ setReplyText, onAdd, replyText }) => {
+const AddReplyButton = ({
+  setReplyText,
+  addReply,
+  replyText,
+  commentId,
+  replyingTo,
+}) => {
   return (
     <Button
       size="large"
@@ -14,7 +20,9 @@ const AddReplyButton = ({ setReplyText, onAdd, replyText }) => {
         },
       }}
       onClick={(e) => {
-        !replyText.trim() ? e.preventDefault() : onAdd(replyText);
+        !replyText.trim()
+          ? e.preventDefault()
+          : addReply(replyText, commentId, replyingTo);
         setReplyText("");
       }}
     >

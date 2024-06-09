@@ -1,11 +1,13 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { Toaster } from "react-hot-toast";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import LoadingScreen from "./components/LoadingScreen";
+import { disconnectSocket, initializeSocket } from "Redux/thunks/socketThunks";
 
 const Loadable = (Component) => (props) => {
   return (
@@ -19,7 +21,16 @@ function App() {
   const mode = useSelector((state) => state.app.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   // const isAuth = Boolean(useSelector((state) => state.token));
-  const isAuth = useSelector((state) => state.auth.token);
+  const isAuth = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(initializeSocket(isAuth._id));
+    } else {
+      dispatch(disconnectSocket());
+    }
+  }, [isAuth]);
   return (
     <div className="app">
       <BrowserRouter>
@@ -49,6 +60,7 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
+      <Toaster />
     </div>
   );
 }

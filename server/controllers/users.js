@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import FriendRequest from "../models/friendRequest.js";
+import bcrypt from "bcrypt";
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -60,6 +61,57 @@ export const addRemoveFriend = async (req, res) => {
     res.status(200).json(formattedFriends);
   } catch (err) {
     res.status(404).json({ message: err.message });
+  }
+};
+
+export const updateUser = async (req, res) => {
+  const { userId } = req.params;
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    newPassword,
+    location,
+    occupation,
+  } = req.body;
+  let picturePath = req.body.picture;
+  console.log("req.params", req.params);
+  console.log("req.body", req.body);
+  console.log("req.file:", req.file); // Debugging
+  console.log("picturePath", picturePath);
+
+  if (req.file) {
+    picturePath = req.file.path;
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.firstName = firstName.trim();
+    user.lastName = lastName.trim();
+    user.email = email.trim();
+    user.location = location.trim();
+    user.occupation = occupation.trim();
+    if (picturePath) user.picturePath = picturePath;
+
+    if (newPassword) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch)
+        return res.status(400).json({ error: "Invalid credentials. " });
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+    }
+
+    await user.save();
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+    res.status(201).json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 

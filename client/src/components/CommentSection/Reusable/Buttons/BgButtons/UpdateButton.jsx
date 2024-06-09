@@ -1,24 +1,28 @@
+import { useTheme } from "@emotion/react";
 import { Button } from "@mui/material";
 import React from "react";
 
-const UpdateButton = ({ commentText, editingComm, setEditingComm }) => {
+const UpdateButton = ({
+  commentText,
+  editingComm,
+  setEditingComm,
+  editComment,
+  commentId,
+}) => {
+  const { palette } = useTheme();
   return (
     <Button
       sx={{
         float: "right",
-        bgcolor: "custom.moderateBlue",
-        color: "neutral.white",
-        p: "8px 25px",
-        "&:hover": {
-          bgcolor: "custom.lightGrayishBlue",
-        },
+        bgcolor: palette.primary.main,
+        color: palette.background.alt,
+        borderRadius: "3rem",
+        marginLeft: 1,
+        p: "4px 16px",
       }}
       onClick={() => {
-        !commentText.trim()
-          ? alert(
-              "If  you want to remove the comment text, just delete the comment."
-            )
-          : setEditingComm(!editingComm);
+        editComment(commentId, commentText);
+        setEditingComm(!editingComm);
       }}
     >
       Update

@@ -6,8 +6,10 @@ import {
   getUsersForSidebar,
   getUsers,
   getRequests,
+  updateUser,
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
+import { upload } from "../utils/upload.js";
 
 const router = express.Router();
 
@@ -21,5 +23,11 @@ router.get("/:id/friends", verifyToken, getUserFriends);
 
 /* UPDATE */
 router.patch("/:id/:friendId", verifyToken, addRemoveFriend);
+router.put(
+  "/updateUser/:userId",
+  upload.single("picture"),
+  verifyToken,
+  updateUser
+);
 
 export default router;

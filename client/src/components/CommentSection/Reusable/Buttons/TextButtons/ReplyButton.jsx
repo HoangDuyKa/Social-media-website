@@ -1,6 +1,5 @@
 import { Button } from "@mui/material";
-// import replyArrow from "../../../../images/icon-reply.svg";
-import replyArrow from "../../../../../images/icon-reply.svg";
+import replyArrow from "assets/Images/icon-reply.svg";
 
 const ReplyButton = ({ functionality }) => {
   return (

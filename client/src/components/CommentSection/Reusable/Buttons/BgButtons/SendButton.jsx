@@ -1,10 +1,7 @@
 import { Button } from "@mui/material";
-import React, { useContext } from "react";
-import CommentContext from "../../../../../commentContext";
+import React from "react";
 
 const SendButton = ({ patchComment, setCommentTxt, commentTxt }) => {
-  const { addComment } = useContext(CommentContext);
-
   return (
     <Button
       size="large"

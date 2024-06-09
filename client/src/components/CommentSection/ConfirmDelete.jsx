@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   Button,
   Stack,
@@ -7,10 +7,14 @@ import {
   DialogTitle,
   DialogContent,
 } from "@mui/material";
-import CommentContext from "../../commentContext";
 
-const ConfirmDelete = ({ onOpen, onClose, id, onDel, comId }) => {
-  const { deleteComment } = useContext(CommentContext);
+const ConfirmDelete = ({ onOpen, onClose, id, deleteComment }) => {
+  const handleDeleteComment = async () => {
+    // const data = await fetch("")
+
+    deleteComment(id);
+    onClose();
+  };
   return (
     <Dialog open={onOpen} onClose={onClose}>
       <DialogContent sx={{ maxWidth: "430px" }}>
@@ -44,7 +48,7 @@ const ConfirmDelete = ({ onOpen, onClose, id, onDel, comId }) => {
               "&:hover": { bgcolor: "custom.softRed" },
             }}
             onClick={() => {
-              onDel ? onDel(comId) : deleteComment(id);
+              handleDeleteComment();
             }}
           >
             Yes, delete

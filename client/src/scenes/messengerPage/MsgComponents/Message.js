@@ -14,7 +14,7 @@ import {
   setCurrentMessages,
 } from "Redux/Slice/conversation";
 import notificationSound from "assets/sounds/notification.mp3";
-import { useSocketContext } from "SocketContext";
+import { getSocket } from "socket";
 
 // import { Chat_History } from "data";
 
@@ -29,6 +29,7 @@ const Message = ({ menu, nonedisplay }) => {
   let Chat_History = current_messages;
 
   // console.log(messages, selectedConversation);
+  const socket = getSocket();
 
   useEffect(() => {
     const getMessages = async () => {
@@ -60,7 +61,7 @@ const Message = ({ menu, nonedisplay }) => {
   //   }, 100);
   // }, [current_messages]);
 
-  const { socket } = useSocketContext();
+  // const socket = getSocket();
 
   useEffect(() => {
     socket?.on("newMessage", (newMessage) => {

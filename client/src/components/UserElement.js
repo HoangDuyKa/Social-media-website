@@ -10,9 +10,9 @@ import {
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { Chat } from "phosphor-react";
-import { useSocketContext } from "SocketContext";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "Redux/Slice/auth";
+import { getSocket } from "socket";
 
 const user_id = window.localStorage.getItem("user_id");
 
@@ -55,7 +55,7 @@ const UserElement = ({ picturePath, firstName, lastName, online, _id }) => {
   const theme = useTheme();
 
   const name = `${firstName} ${lastName}`;
-  const { socket } = useSocketContext();
+  const socket = getSocket();
   return (
     <StyledChatBox
       sx={{
@@ -134,7 +134,8 @@ const FriendRequestElement = ({
     // console.log(data);
     dispatch(setFriends({ friends: data }));
   };
-  const { socket } = useSocketContext();
+  const socket = getSocket();
+
   return (
     <StyledChatBox
       sx={{
@@ -197,7 +198,7 @@ const FriendElement = ({
   const theme = useTheme();
 
   const name = `${firstName} ${lastName}`;
-  const { socket } = useSocketContext();
+  const socket = getSocket();
   return (
     <StyledChatBox
       sx={{

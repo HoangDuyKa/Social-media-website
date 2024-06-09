@@ -5,14 +5,13 @@ import {
   ShareOutlined,
 } from "@mui/icons-material";
 import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
-import { CommentProvider } from "commentContext";
-import Core from "components/CommentSection/Core";
+import CoreComment from "components/CommentSection/Core";
 import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "Redux/Slice/app";
+import { setPost, setPosts } from "Redux/Slice/app";
 
 const PostWidget = ({
   postId,
@@ -39,6 +38,7 @@ const PostWidget = ({
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
+  const [lengthComment, setLengthComment] = useState(0);
 
   const patchLike = async () => {
     const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
@@ -69,11 +69,112 @@ const PostWidget = ({
       }
     );
     const updatedPost = await response.json();
+    console.log(updatedPost);
+    dispatch(setPost({ post: updatedPost }));
+  };
+
+  const deleteComment = async (commentId) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/deleteComment`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
+    dispatch(setPost({ post: updatedPost }));
+  };
+
+  const editComment = async (commentId, newComment) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/editComment`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId,
+          newComment,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
+    dispatch(setPost({ post: updatedPost }));
+  };
+
+  const patchReplyComment = async (
+    replyCommentText,
+    replyCommentId,
+    replyingTo
+  ) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/replyComment`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          replyCommentText,
+          replyCommentId,
+          replyingTo,
+          UserReplyComment: loggedInUser,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
+    console.log(updatedPost);
+    dispatch(setPost({ post: updatedPost }));
+  };
+
+  const deleteReplyComment = async (commentId) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/deleteReplyComment`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
+    dispatch(setPost({ post: updatedPost }));
+  };
+
+  const editReplyComment = async (commentId, newComment) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/editReplyComment`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId,
+          newComment,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
 
   return (
-    <WidgetWrapper m={trashPosts ? "0 0 2rem" : "2rem 0"}>
+    <WidgetWrapper m={trashPosts ? "0 0 2rem" : "1rem 0"}>
       <Friend
         friendId={postUserId}
         name={name}
@@ -111,7 +212,7 @@ const PostWidget = ({
         </video>
       )} */}
 
-      {file.fileType === "Image" && (
+      {file?.fileType === "Image" && (
         <img
           width="100%"
           height="auto"
@@ -121,7 +222,7 @@ const PostWidget = ({
         />
       )}
 
-      {file.fileType === "Video" && (
+      {file?.fileType === "Video" && (
         <video
           width="100%"
           height="auto"
@@ -133,7 +234,7 @@ const PostWidget = ({
         </video>
       )}
 
-      {file.fileType === "File" && (
+      {file?.fileType === "File" && (
         <div>
           {/* <h3>Document Preview</h3> */}
           <a
@@ -160,6 +261,7 @@ const PostWidget = ({
                     cursor: "pointer",
                     color: palette.primary.light,
                   },
+                  width: "122px",
                 }}
                 onClick={() => SetIsPreviewPDF(!isPreviewPDF)}
               >
@@ -171,7 +273,7 @@ const PostWidget = ({
                   // src="https://www.clickdimensions.com/links/TestPDFfile.pdf"
                   // width="840"
                   width={"100%"}
-                  height="1000"
+                  height="800px"
                   title="Document Preview"
                 ></iframe>
               )}
@@ -190,7 +292,7 @@ const PostWidget = ({
         // </div>
       )}
 
-      {file.fileType === "Audio" && (
+      {file?.fileType === "Audio" && (
         <audio controls>
           <source src={file.path} />
         </audio>
@@ -232,10 +334,16 @@ const PostWidget = ({
             // </Box>
             
           ))} */}
-          {/* <Divider /> */}
-          <CommentProvider>
-            <Core patchComment={patchComment} postId={postId} />
-          </CommentProvider>
+          <Divider sx={{ marginBottom: "1rem" }} />
+          <CoreComment
+            patchComment={patchComment}
+            deleteComment={deleteComment}
+            editComment={editComment}
+            patchReplyComment={patchReplyComment}
+            postId={postId}
+            postUserId={postUserId}
+            UserCommentImage={loggedInUser.picturePath}
+          />
         </Box>
       )}
     </WidgetWrapper>

@@ -1,24 +1,18 @@
-import { Avatar, Card, Stack, ThemeProvider, createTheme } from "@mui/material";
+import { Avatar, Card, Stack } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useContext, useMemo, useState } from "react";
-import CommentContext from "../../commentContext";
+import React, { useState } from "react";
 import AddReplyButton from "./Reusable/Buttons/BgButtons/AddReplyButton";
 import EditableReplyField from "./Reusable/Reply/EditableReplyField";
-import { useSelector } from "react-redux";
-import { themeSettings } from "theme";
 
-const AddReply = ({ onAdd }) => {
-  const mode = useSelector((state) => state.app.mode);
-  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-  const { IMGOBJ } = useContext(CommentContext);
+const AddReply = ({ addReply, loggedInUserImage, commentId, replyingTo }) => {
   const [replyText, setReplyText] = useState("");
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Card>
         <Box sx={{ p: "15px" }}>
           <Stack direction="row" spacing={2} alignItems="flex-start">
             <Avatar
-              src={IMGOBJ.juliusomo}
+              src={loggedInUserImage}
               variant="rounded"
               alt="user-avatar"
             />
@@ -28,14 +22,16 @@ const AddReply = ({ onAdd }) => {
               text={replyText}
             />
             <AddReplyButton
-              onAdd={onAdd}
+              addReply={addReply}
               replyText={replyText}
               setReplyText={setReplyText}
+              commentId={commentId}
+              replyingTo={replyingTo}
             />
           </Stack>
         </Box>
       </Card>
-    </ThemeProvider>
+    </>
   );
 };
 

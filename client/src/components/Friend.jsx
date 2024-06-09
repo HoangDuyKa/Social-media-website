@@ -19,11 +19,13 @@ import { Restore } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "../Redux/Slice/auth";
+import toast from "react-hot-toast";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 import StyledBadge from "./StyledBadge";
 import { DotsThreeVertical } from "phosphor-react";
 import { useState } from "react";
+import { setPost, setPosts } from "Redux/Slice/app";
 
 const Friend = ({
   friendId,
@@ -61,50 +63,73 @@ const Friend = ({
       }
     );
     const data = await response.json();
-    // console.log(data);
+    console.log(data);
     dispatch(setFriends({ friends: data }));
   };
 
   const softDeletePost = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-  };
-
-  const destroyPost = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/force`,
-      {
+    try {
+      const response = await fetch(`http://localhost:3001/posts/${postId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
       }
-    );
-    const data = await response.json();
-    console.log(data);
+      dispatch(setPosts({ posts: data }));
+      toast.success("Deleted successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const destroyPost = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/posts/${postId}/force`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+      toast.success("Deleted Forever Successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const restorePost = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/restore`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+    try {
+      const response = await fetch(
+        `http://localhost:3001/posts/${postId}/restore`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
       }
-    );
-    const data = await response.json();
-    console.log(data);
+      toast.success("Restore Post Successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const onlineUsers = useSelector((state) => state.app.onlineUsers);
@@ -126,25 +151,31 @@ const Friend = ({
           <UserImage image={userPicturePath} size="55px" />
         )}
 
-        <Box
-          onClick={() => {
-            navigate(`/profile/${friendId}`);
-            navigate(0);
-          }}
-        >
-          <Typography
-            color={main}
-            variant="h5"
-            fontWeight="500"
-            sx={{
-              "&:hover": {
-                color: palette.primary.light,
-                cursor: "pointer",
-              },
+        <Box>
+          <Box
+            onClick={() => {
+              navigate(`/profile/${friendId}`);
+              navigate(0);
             }}
           >
-            {name}
-          </Typography>
+            <Typography
+              color={main}
+              variant="h5"
+              fontWeight="500"
+              sx={{
+                maxWidth: "200px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                "&:hover": {
+                  color: palette.primary.light,
+                  cursor: "pointer",
+                },
+              }}
+            >
+              {name}
+            </Typography>
+          </Box>
           <Typography color={medium} fontSize="0.75rem">
             {subtitle}
           </Typography>

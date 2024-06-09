@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 
@@ -5,27 +6,10 @@ import User from "../models/User.js";
 export const createPost = async (req, res) => {
   try {
     const { userId, description, fileType, fileName } = req.body;
-    // let fileUrl = "";
-    // console.log(req.files);
-    // if (req.files) {
-    //   if (req.files.picture) {
-    //     fileUrl = "image " + req.files.picture[0].path;
-    //   } else if (req.files.video) {
-    //     fileUrl = "video " + req.files.video[0].path;
-    //   } else if (req.files.file) {
-    //     fileUrl = "file " + req.files.file[0].path;
-    //   } else {
-    //     fileUrl = "noFile";
-    //   }
-    // }
-
     let filePath = "noFile";
     if (req.file) {
       filePath = req.file.path;
     }
-
-    console.log(req.file);
-    console.log(req.body);
     const user = await User.findById(userId);
     const newPost = new Post({
       userId,
@@ -34,7 +18,6 @@ export const createPost = async (req, res) => {
       location: user.location,
       description,
       userPicturePath: user.picturePath,
-      // picturePath: fileUrl,
       file: {
         path: filePath,
         fileType: fileType,
@@ -48,7 +31,7 @@ export const createPost = async (req, res) => {
     const post = await Post.find().sort({ createdAt: -1 });
     res.status(201).json(post);
   } catch (err) {
-    res.status(409).json({ message: err.message });
+    res.status(409).json({ error: err.message });
   }
 };
 
@@ -126,10 +109,12 @@ export const commentPost = async (req, res) => {
         comments: [
           ...post.comments,
           {
+            commentId: new mongoose.Types.ObjectId(),
             UserComment,
             commentText,
             updatedAt: new Date(),
             createdAt: new Date(),
+            replies: [],
           },
         ],
       },
@@ -137,22 +122,151 @@ export const commentPost = async (req, res) => {
     );
 
     res.status(200).json(updatedPost);
-
-    // if (isLiked) {
-    //   post.likes.delete(userId);
-    // } else {
-    //   post.likes.set(userId, true);
-    // }
-
-    // const updatedPost = await Post.findByIdAndUpdate(
-    //   id,
-    //   { likes: post.likes },
-    //   { new: true }
-    // );
-
-    // res.status(200).json(updatedPost);
   } catch (err) {
     res.status(404).json({ message: err.message });
+  }
+};
+
+export const editComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commentId, newComment } = req.body;
+    console.log(req.body);
+
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    const comment = post.comments.find(
+      (comment) => comment.commentId.toString() === commentId
+    );
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    comment.commentText = newComment;
+    post.markModified("comments");
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commentId } = req.body;
+
+    // Tìm post bằng id
+    const post = await Post.findById(id);
+
+    const filteredComments = post.comments.filter(
+      (comment) => comment.commentId.toString() !== commentId
+    );
+    post.comments = filteredComments;
+
+    // Lưu post sau khi xoá comment
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const replyCommentPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { UserReplyComment, replyCommentId, replyCommentText, replyingTo } =
+      req.body;
+    // console.log(req.body);
+    const post = await Post.findById(id);
+    const comment = post.comments.find(
+      (comment) => comment.commentId.toString() === replyCommentId
+    );
+    comment.replies.push({
+      replyCommentId: new mongoose.Types.ObjectId(),
+      UserReplyComment,
+      replyCommentText,
+      replyingTo,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    });
+    post.markModified("comments");
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
+    // const updatedPost = await Post.findByIdAndUpdate(
+    //   id,
+    //   {
+    //     comments: [
+    //       ...post.comments,
+    //       {
+    //         replies: [
+    //           {
+    //             replyCommentId: new mongoose.Types.ObjectId(),
+    //             UserComment,
+    //             replyCommentText,
+    //             updatedAt: new Date(),
+    //             createdAt: new Date(),
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+    //   { new: true }
+    // );
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+export const editReplyComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commentId, newComment } = req.body;
+    console.log(req.body);
+
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    const comment = post.comments.find(
+      (comment) => comment.commentId.toString() === commentId
+    );
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    comment.commentText = newComment;
+    post.markModified("comments");
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteReplyComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commentId } = req.body;
+
+    // Tìm post bằng id
+    const post = await Post.findById(id);
+
+    const filteredComments = post.comments.filter(
+      (comment) => comment.commentId.toString() !== commentId
+    );
+    post.comments = filteredComments;
+
+    // Lưu post sau khi xoá comment
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -170,8 +284,9 @@ export const restorePost = async (req, res) => {
 export const softDelete = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await Post.delete({ _id: id });
-    res.status(200).json(post);
+    await Post.delete({ _id: id });
+    const remainPost = await Post.find();
+    res.status(200).json(remainPost);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -180,8 +295,9 @@ export const softDelete = async (req, res) => {
 export const destroyPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await Post.deleteOne({ _id: id });
-    res.status(200).json(post);
+    await Post.deleteOne({ _id: id });
+    const remainPost = await Post.findWithDeleted({ deleted: true });
+    res.status(200).json(remainPost);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }

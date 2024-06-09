@@ -4,7 +4,7 @@ import appReducer from "./Slice/app";
 import authReducer from "./Slice/auth";
 import conversationReducer from "./Slice/conversation";
 
-const persistConfig = { key: "root", storage, version: 1 };
+const persistConfig = { key: "root", storage, version: 0.1 };
 
 const rootReducer = combineReducers({
   app: appReducer,

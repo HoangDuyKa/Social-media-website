@@ -5,7 +5,7 @@ import {
   GifBoxOutlined,
   ImageOutlined,
   MicOutlined,
-  MoreHorizOutlined,
+  // MoreHorizOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Dropzone from "react-dropzone";
+import toast from "react-hot-toast";
 import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
@@ -49,44 +50,52 @@ const MyPostWidget = ({ picturePath }) => {
   };
 
   const handlePost = async () => {
-    setIsLoading(true);
-    const formData = new FormData();
-    formData.append("userId", _id);
-    formData.append("description", post);
-    if (file) {
-      formData.append("file", file);
-      // console.log(file);
-      formData.append("fileType", fileType);
-      formData.append("fileName", file.name);
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("userId", _id);
+      formData.append("description", post);
+      if (file) {
+        formData.append("file", file);
+        formData.append("fileType", fileType);
+        formData.append("fileName", file.name);
+      }
+      // if (image) {
+      //   formData.append("image", image);
+      // } else if (video) {
+      //   formData.append("video", video);
+      // } else if (file) {
+      //   formData.append("file", file);
+      // }
+      // console.log("image", image);
+      // console.log("video", video);
+      // console.log("file", file);
+
+      const response = await fetch(`http://localhost:3001/posts`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const posts = await response.json();
+      if (posts.error) {
+        setIsLoading(false);
+        throw new Error(posts.error);
+      }
+      // console.log(posts);
+      dispatch(setPosts({ posts }));
+      // setImage(null);
+      // setVideo(null);
+      // setIsImage(false);
+      // setIsVideo(false);
+      setFileType("");
+      setFile(null);
+      setPost("");
+      setIsLoading(false);
+      toast.success("Post was Successfully");
+    } catch (error) {
+      toast.error(error.message);
     }
-    // if (image) {
-    //   formData.append("image", image);
-    // } else if (video) {
-    //   formData.append("video", video);
-    // } else if (file) {
-    //   formData.append("file", file);
-    // }
-    // console.log("image", image);
-    // console.log("video", video);
-    // console.log("file", file);
-
-    const response = await fetch(`http://localhost:3001/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-
-    const posts = await response.json();
-    // console.log(posts);
-    dispatch(setPosts({ posts }));
-    // setImage(null);
-    // setVideo(null);
-    // setIsImage(false);
-    // setIsVideo(false);
-    setFileType("");
-    setFile(null);
-    setPost("");
-    setIsLoading(false);
   };
 
   return (
@@ -332,13 +341,16 @@ const MyPostWidget = ({ picturePath }) => {
             <FlexBetween
               gap="0.25rem"
               onClick={() =>
-                fileType === ""
-                  ? handleFileTypeChange("Image")
-                  : setFileType("")
+                // fileType === ""
+                //   ? handleFileTypeChange("Image")
+                //   : setFileType("")
+                fileType === "Image"
+                  ? setFileType("")
+                  : handleFileTypeChange("Image")
               }
             >
               {/* <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}> */}
-              <ImageOutlined sx={{ color: mediumMain }} />
+              <ImageOutlined sx={{ cursor: "pointer", color: mediumMain }} />
               <Typography
                 color={mediumMain}
                 sx={{ "&:hover": { cursor: "pointer", color: medium } }}
@@ -349,13 +361,16 @@ const MyPostWidget = ({ picturePath }) => {
             <FlexBetween
               gap="0.25rem"
               onClick={() =>
-                fileType === ""
-                  ? handleFileTypeChange("Video")
-                  : setFileType("")
+                // fileType === ""
+                //   ? handleFileTypeChange("Video")
+                //   : setFileType("")
+                fileType === "Video"
+                  ? setFileType("")
+                  : handleFileTypeChange("Video")
               }
             >
               {/* <FlexBetween gap="0.25rem" onClick={() => setIsVideo(!isVideo)}> */}
-              <GifBoxOutlined sx={{ color: mediumMain }} />
+              <GifBoxOutlined sx={{ cursor: "pointer", color: mediumMain }} />
               <Typography
                 color={mediumMain}
                 sx={{ "&:hover": { cursor: "pointer", color: medium } }}
@@ -367,11 +382,16 @@ const MyPostWidget = ({ picturePath }) => {
             <FlexBetween
               gap="0.25rem"
               onClick={() =>
-                fileType === "" ? handleFileTypeChange("File") : setFileType("")
+                // fileType === "" ? handleFileTypeChange("File") : setFileType("")
+                fileType === "File"
+                  ? setFileType("")
+                  : handleFileTypeChange("File")
               }
             >
               {/* <FlexBetween gap="0.25rem" onClick={() => setIsFile(!isFile)}> */}
-              <AttachFileOutlined sx={{ color: mediumMain }} />
+              <AttachFileOutlined
+                sx={{ cursor: "pointer", color: mediumMain }}
+              />
               <Typography
                 color={mediumMain}
                 sx={{ "&:hover": { cursor: "pointer", color: medium } }}
@@ -383,12 +403,15 @@ const MyPostWidget = ({ picturePath }) => {
             <FlexBetween
               gap="0.25rem"
               onClick={() =>
-                fileType === ""
-                  ? handleFileTypeChange("Audio")
-                  : setFileType("")
+                // fileType === ""
+                //   ? handleFileTypeChange("Audio")
+                //   : setFileType("")
+                fileType === "Audio"
+                  ? setFileType("")
+                  : handleFileTypeChange("Audio")
               }
             >
-              <MicOutlined sx={{ color: mediumMain }} />
+              <MicOutlined sx={{ cursor: "pointer", color: mediumMain }} />
               <Typography
                 color={mediumMain}
                 sx={{ "&:hover": { cursor: "pointer", color: medium } }}
@@ -400,18 +423,46 @@ const MyPostWidget = ({ picturePath }) => {
         ) : (
           <>
             {/* <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}> */}
-            <FlexBetween gap="0.25rem">
+            <FlexBetween
+              gap="0.25rem"
+              onClick={() =>
+                fileType === "Image"
+                  ? setFileType("")
+                  : handleFileTypeChange("Image")
+              }
+            >
               <ImageOutlined sx={{ color: mediumMain }} />
             </FlexBetween>
-            <FlexBetween gap="0.25rem">
+            <FlexBetween
+              gap="0.25rem"
+              onClick={() =>
+                fileType === "Video"
+                  ? setFileType("")
+                  : handleFileTypeChange("Video")
+              }
+            >
               <GifBoxOutlined sx={{ color: mediumMain }} />
             </FlexBetween>
 
-            <FlexBetween gap="0.25rem">
+            <FlexBetween
+              gap="0.25rem"
+              onClick={() =>
+                fileType === "File"
+                  ? setFileType("")
+                  : handleFileTypeChange("File")
+              }
+            >
               <AttachFileOutlined sx={{ color: mediumMain }} />
             </FlexBetween>
 
-            <FlexBetween gap="0.25rem">
+            <FlexBetween
+              gap="0.25rem"
+              onClick={() =>
+                fileType === "Audio"
+                  ? setFileType("")
+                  : handleFileTypeChange("Audio")
+              }
+            >
               <MicOutlined sx={{ color: mediumMain }} />
             </FlexBetween>
           </>

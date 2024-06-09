@@ -120,7 +120,6 @@ import {
   useTheme,
   alpha,
 } from "@mui/material";
-import { useSocketContext } from "SocketContext";
 import { useDispatch, useSelector } from "react-redux";
 import StyledBadge from "./StyledBadge";
 import { SetCurrentConversation } from "Redux/Slice/conversation";

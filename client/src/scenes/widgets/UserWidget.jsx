@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const UserWidget = ({ userId, picturePath }) => {
+const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const UserWidget = ({ userId, picturePath }) => {
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
+  const logginUserId = useSelector((state) => state.auth.user);
 
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
@@ -75,7 +76,14 @@ const UserWidget = ({ userId, picturePath }) => {
             <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
         </FlexBetween>
-        <ManageAccountsOutlined />
+        {logginUserId._id === user._id && (
+          <ManageAccountsOutlined
+            sx={{ cursor: "pointer" }}
+            onClick={() => {
+              setEditUser(!editUser);
+            }}
+          />
+        )}
       </FlexBetween>
 
       <Divider />

@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   },
 });
 
@@ -22,7 +22,6 @@ export const getReceiverSocketId = (receiverId) => {
 };
 
 const userSocketMap = {}; // {userId: socketId}
-
 io.on("connection", async (socket) => {
   console.log("a user connected", socket.id);
 
@@ -221,6 +220,7 @@ io.on("connection", async (socket) => {
   });
 
   // socket.on() is used to listen to the events. can be used both on client and server side
+
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
     delete userSocketMap[userId];

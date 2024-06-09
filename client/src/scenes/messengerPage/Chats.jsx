@@ -19,13 +19,14 @@ import {
 } from "phosphor-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSocketContext } from "SocketContext";
+import { getSocket } from "socket";
+
 import {
   AddDirectConversation,
-  FetchDirectConversations,
   SetCurrentConversation,
   UpdateDirectConversation,
   setUnreadConversation,
+  FetchDirectConversations,
 } from "Redux/Slice/conversation";
 import Friends from "scenes/Dialog/FriendsDialog";
 
@@ -42,7 +43,8 @@ const Chats = () => {
   };
   const theme = useTheme();
   const token = useSelector((state) => state.auth.token);
-  const { socket } = useSocketContext();
+  const socket = getSocket();
+
   const [unread, setUnread] = useState(0);
 
   const dispatch = useDispatch();

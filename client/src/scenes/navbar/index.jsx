@@ -26,9 +26,9 @@ import { setMode } from "Redux/Slice/app";
 import { setLogout } from "Redux/Slice/auth";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
-import { useSocketContext } from "SocketContext";
 // import UserImage from "components/UserImage";
 import notificationSound from "assets/sounds/notification.mp3";
+import { getSocket } from "socket";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -46,12 +46,13 @@ const Navbar = () => {
 
   const fullName = `${user.firstName} ${user.lastName}`;
 
-  const { socket } = useSocketContext();
+  const socket = getSocket();
 
   useEffect(() => {
     socket?.on("newMessage", (newMessage) => {
       // newMessage.shouldShake = true;
       const sound = new Audio(notificationSound);
+      console.log("yes");
       sound.play();
     });
 

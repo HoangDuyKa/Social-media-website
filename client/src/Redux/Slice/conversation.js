@@ -43,7 +43,7 @@ export const conversationSlice = createSlice({
           name: `${user?.firstName} ${user?.lastName}`,
           online: user?.status === "Online",
           img: user.picturePath,
-          msg: el.messages ? el.messages.slice(-1)[0].message : "",
+          msg: el.messages ? el.messages.slice(-1)[0]?.message : "",
           time: "9:36",
           unread: user.unread ? user.unread : 0,
           pinned: false,

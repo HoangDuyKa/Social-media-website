@@ -7,12 +7,15 @@ import FriendListWidget from "scenes/widgets/FriendListWidget";
 import MyPostWidget from "scenes/widgets/MyPostWidget";
 import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
+import FormEditUser from "./FormEditUser";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
+  const { _id } = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const [editUser, setEditUser] = useState(false);
 
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
@@ -40,18 +43,35 @@ const ProfilePage = () => {
         justifyContent="center"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={userId} picturePath={user.picturePath} />
+          <UserWidget
+            userId={userId}
+            picturePath={user.picturePath}
+            editUser={editUser}
+            setEditUser={setEditUser}
+          />
           <Box m="2rem 0" />
           <FriendListWidget userId={userId} />
         </Box>
-        <Box
-          flexBasis={isNonMobileScreens ? "74%" : undefined}
-          mt={isNonMobileScreens ? undefined : "2rem"}
-        >
-          <MyPostWidget picturePath={user.picturePath} />
-          <Box m="2rem 0" />
-          <PostsWidget userId={userId} isProfile />
-        </Box>
+        {editUser ? (
+          <Box
+            flexBasis={isNonMobileScreens ? "74%" : undefined}
+            mt={isNonMobileScreens ? undefined : "2rem"}
+          >
+            <FormEditUser user={user} setEditUser={setEditUser} />
+          </Box>
+        ) : (
+          <Box
+            flexBasis={isNonMobileScreens ? "74%" : undefined}
+            mt={isNonMobileScreens ? undefined : "2rem"}
+          >
+            {userId === _id && (
+              <MyPostWidget picturePath={user.picturePath} isProfile />
+            )}
+
+            <Box m="2rem 0" />
+            <PostsWidget userId={userId} isProfile />
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -1,7 +1,5 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Box, Card, Stack, Avatar } from "@mui/material";
-import CommentContext from "../../commentContext";
-import ScoreChanger from "./ScoreChanger";
 import ConfirmDelete from "./ConfirmDelete";
 import Username from "./Reusable/Username";
 import CreatedAt from "./Reusable/CreatedAt";
@@ -12,9 +10,6 @@ import UpdateReplyButton from "./Reusable/Buttons/BgButtons/UpdateReplyButton";
 import EditableReplyField from "./Reusable/Reply/EditableReplyField";
 
 const OwnReply = ({ onContent, onCount, onTar, onDel, comId }) => {
-  const { IMGOBJ } = useContext(CommentContext);
-  const prsAva = IMGOBJ.juliusomo;
-
   const [clicked, setClicked] = useState(false);
   const [editingRep, setEditingRep] = useState(false);
   const [repText, setRepText] = useState(onContent);
@@ -53,7 +48,7 @@ const OwnReply = ({ onContent, onCount, onTar, onDel, comId }) => {
                 alignItems="center"
               >
                 <Stack spacing={2} direction="row" alignItems="center">
-                  <Avatar src={prsAva}></Avatar>
+                  <Avatar src={"..."}></Avatar>
                   <Username userName="juliusomo" />
                   <CreatedAt createdAt="Just now" />
                 </Stack>
