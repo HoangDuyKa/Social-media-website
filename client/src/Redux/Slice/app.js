@@ -29,7 +29,7 @@ export const appSlice = createSlice({
         }
         return post;
       });
-      console.log(updatedPosts);
+      // console.log(updatedPosts);
       state.posts = updatedPosts;
     },
     toggleRightbar: (state) => {

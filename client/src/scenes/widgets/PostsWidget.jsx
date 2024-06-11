@@ -2,17 +2,23 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "Redux/Slice/app";
 import PostWidget from "./PostWidget";
-import { Stack, Typography, useTheme } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
-const PostsWidget = ({ userId, isProfile = false, trashPosts = false }) => {
+const PostsWidget = ({
+  userId,
+  isProfile = false,
+  trashPosts = false,
+  detailPost = false,
+  postId,
+}) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.app.posts);
   const token = useSelector((state) => state.auth.token);
 
-  const { palette } = useTheme();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const getPosts = async () => {
-    const response = await fetch("http://localhost:3001/posts", {
+    const response = await fetch(`${apiUrl}/posts`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -21,24 +27,27 @@ const PostsWidget = ({ userId, isProfile = false, trashPosts = false }) => {
   };
 
   const getUserPosts = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${userId}/posts`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`${apiUrl}/posts/${userId}/posts`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
   };
   const getUserTrash = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${userId}/trash`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`${apiUrl}/posts/${userId}/trash`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    dispatch(setPosts({ posts: data }));
+  };
+
+  const getDetailPost = async () => {
+    const response = await fetch(`${apiUrl}/posts/detail/${postId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
   };
@@ -48,6 +57,8 @@ const PostsWidget = ({ userId, isProfile = false, trashPosts = false }) => {
       getUserPosts();
     } else if (trashPosts) {
       getUserTrash();
+    } else if (detailPost) {
+      getDetailPost();
     } else {
       getPosts();
     }
@@ -91,6 +102,7 @@ const PostsWidget = ({ userId, isProfile = false, trashPosts = false }) => {
               likes={likes}
               comments={comments}
               trashPosts={trashPosts}
+              detailPost={detailPost}
             />
           )
         )

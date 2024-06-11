@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+// import { getReceiverSocketId, io } from "../socket/socket.js";
+import { createNotifications } from "./notification.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
@@ -10,6 +12,7 @@ export const createPost = async (req, res) => {
     if (req.file) {
       filePath = req.file.path;
     }
+
     const user = await User.findById(userId);
     const newPost = new Post({
       userId,
@@ -71,20 +74,46 @@ export const getUserTrash = async (req, res) => {
   }
 };
 
+export const getDetailPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    console.log("postId: " + postId);
+    const post = await Post.find({ _id: postId });
+
+    console.log("post", post);
+    res.status(200).json(post);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
 /* UPDATE */
 export const likePost = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { userId } = req.body;
+    const { id } = req.params; // id of post
+    const { userId, postUserId } = req.body; //userId of like post
     const post = await Post.findById(id);
     const isLiked = post.likes.get(userId);
+    const user = await User.findById(userId);
+    const notificationMessage = `${user.firstName} has liked your post`;
+    const senderImage = user.picturePath;
+    const navigator = `/detail/post/${id}`;
 
     if (isLiked) {
       post.likes.delete(userId);
     } else {
       post.likes.set(userId, true);
+      if (userId !== postUserId) {
+        createNotifications(
+          id,
+          senderImage,
+          "like",
+          notificationMessage,
+          postUserId,
+          navigator
+        );
+      }
     }
-
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       { likes: post.likes },
@@ -101,8 +130,9 @@ export const commentPost = async (req, res) => {
   try {
     const { id } = req.params;
     const { UserComment, commentText } = req.body;
-    console.log(req.body);
     const post = await Post.findById(id);
+    const navigator = `/detail/post/${id}`;
+
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       {
@@ -120,6 +150,18 @@ export const commentPost = async (req, res) => {
       },
       { new: true }
     );
+    const notificationMessage = `${UserComment.firstName} had commented your post`;
+
+    if (UserComment._id !== post.userId) {
+      createNotifications(
+        UserComment._id,
+        UserComment.picturePath,
+        "comment",
+        notificationMessage,
+        post.userId,
+        navigator
+      );
+    }
 
     res.status(200).json(updatedPost);
   } catch (err) {

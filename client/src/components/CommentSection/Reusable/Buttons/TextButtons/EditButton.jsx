@@ -14,9 +14,7 @@ const EditButton = ({ functionality, editingComm }) => {
       onClick={() => {
         functionality();
       }}
-    >
-      Edit
-    </Button>
+    ></Button>
   );
 };
 

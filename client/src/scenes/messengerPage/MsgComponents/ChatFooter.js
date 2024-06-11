@@ -134,6 +134,7 @@ const ChatFooter = () => {
   const [message, setMessage] = useState("");
   const dispatch = useDispatch();
   const inputRef = useRef(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   function handleEmojiClick(emoji) {
     const input = inputRef.current;
@@ -161,7 +162,7 @@ const ChatFooter = () => {
   const sendMessage = async (message, type) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/messages/send/${current_conversation.user_id}`,
+        `${apiUrl}/messages/send/${current_conversation.user_id}`,
         {
           method: "POST",
           headers: {

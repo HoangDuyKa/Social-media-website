@@ -43,6 +43,7 @@ const MyPostWidget = ({ picturePath }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleFileTypeChange = (type) => {
     setFileType(type);
@@ -71,7 +72,7 @@ const MyPostWidget = ({ picturePath }) => {
       // console.log("video", video);
       // console.log("file", file);
 
-      const response = await fetch(`http://localhost:3001/posts`, {
+      const response = await fetch(`${apiUrl}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -99,7 +100,7 @@ const MyPostWidget = ({ picturePath }) => {
   };
 
   return (
-    <WidgetWrapper>
+    <WidgetWrapper sx={{ m: "0 0 1rem" }}>
       <FlexBetween gap="1.5rem">
         <UserImage image={picturePath} />
         <InputBase

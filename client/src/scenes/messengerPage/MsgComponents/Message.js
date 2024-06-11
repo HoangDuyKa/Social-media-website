@@ -23,6 +23,7 @@ const Message = ({ menu, nonedisplay }) => {
     (state) => state.conversation.direct_chat
   );
   const token = useSelector((state) => state.auth.token);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   // const lastMessageRef = useRef();
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const Message = ({ menu, nonedisplay }) => {
     const getMessages = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/messages/${current_conversation.user_id}`,
+          `${apiUrl}/messages/${current_conversation.user_id}`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
@@ -69,6 +70,8 @@ const Message = ({ menu, nonedisplay }) => {
       if (!document.hasFocus() || document.hasFocus()) {
         const sound = new Audio(notificationSound);
         sound.play();
+        // console.log(newMessage);
+        // toast.success(newMessage.message);
       }
       // let newMessages = Object.assign({}, [...messages, newMessage]);
       let newMessages = [...current_messages, newMessage];

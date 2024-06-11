@@ -51,7 +51,7 @@ const RepliesSection = ({
         } = rep;
         const username = `${UserReplyComment.firstName} ${UserReplyComment.lastName}`;
         // loggedInUser._id === UserComment._id
-        return username === "juliusomo" ? (
+        return username === "" ? (
           <OwnReply
             key={rep.id}
             comId={rep.id}
@@ -62,10 +62,10 @@ const RepliesSection = ({
             // onDel={deleteReply}
           />
         ) : (
-          <Card key={rep.id}>
-            <Box sx={{ p: "15px" }}>
+          <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }} key={rep.id}>
+            <Box>
               <Stack spacing={2} direction="row">
-                <Box>{/* <ScoreChanger onScore={score} /> */}</Box>
+                {/* <Box><ScoreChanger onScore={score} /></Box> */}
                 <Box sx={{ width: "100%" }}>
                   <Stack
                     spacing={2}
@@ -83,42 +83,22 @@ const RepliesSection = ({
                           }}
                           variant="dot"
                         >
-                          <Avatar src={loggedInUserImage}></Avatar>
+                          <Avatar src={UserReplyComment.picturePath}></Avatar>
                         </StyledBadge>
                       ) : (
                         <Avatar src={loggedInUserImage}></Avatar>
                       )}
-                      {/* <Typography
-                        fontWeight="bold"
-                        sx={{ color: "neutral.darkBlue" }}
-                      >
-                        {username}
-                      </Typography> */}
                       <Username
                         userName={username}
                         UserComment={UserReplyComment}
                         loggedInUserId={loggedInUser._id}
                       />
                       <CreatedAt createdAt={createdAt} />
-                      {/* <Typography sx={{ color: "neutral.grayishBlue" }}>
-                        {createdAt}
-                      </Typography> */}
                     </Stack>
-                    {/* <Button
-                      variant="text"
-                      sx={{
-                        fontWeight: 500,
-                        textTransform: "capitalize",
-                        color: "custom.moderateBlue",
-                      }}
-                      startIcon={<img src={replyArrow} alt="reply sign" />}
-                    >
-                      Reply
-                    </Button> */}
                   </Stack>
                   <Typography
                     component="div"
-                    sx={{ color: "neutral.grayishBlue", p: "20px 0" }}
+                    sx={{ color: "neutral.grayishBlue", p: "1rem 0 0" }}
                   >
                     <Typography
                       sx={{

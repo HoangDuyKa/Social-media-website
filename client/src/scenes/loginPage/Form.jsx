@@ -74,6 +74,7 @@ const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const register = async (values, onSubmitProps) => {
     // this allows us to send form info with image
@@ -85,13 +86,10 @@ const Form = () => {
       }
       // formData.append("picturePath", values.picture.name);
 
-      const savedUserResponse = await fetch(
-        "http://localhost:3001/auth/register",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const savedUserResponse = await fetch(`${apiUrl}/auth/register`, {
+        method: "POST",
+        body: formData,
+      });
       const savedUser = await savedUserResponse.json();
       if (savedUser.error) {
         throw new Error(savedUser.error);

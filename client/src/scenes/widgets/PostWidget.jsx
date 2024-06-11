@@ -11,7 +11,7 @@ import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost, setPosts } from "Redux/Slice/app";
+import { setPost } from "Redux/Slice/app";
 
 const PostWidget = ({
   postId,
@@ -24,8 +24,9 @@ const PostWidget = ({
   likes,
   comments,
   trashPosts,
+  detailPost,
 }) => {
-  const [isComments, setIsComments] = useState(false);
+  const [isComments, setIsComments] = useState(detailPost);
   const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
@@ -38,74 +39,67 @@ const PostWidget = ({
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
-  const [lengthComment, setLengthComment] = useState(0);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const patchLike = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+    const response = await fetch(`${apiUrl}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userId: loggedInUserId }),
+      body: JSON.stringify({ userId: loggedInUserId, postUserId }),
+    });
+    const updatedPost = await response.json();
+    if (updatedPost.error) throw new Error(updatedPost.error);
+
+    dispatch(setPost({ post: updatedPost }));
+    // dispatch(setPost({ post: updatedPost }));
+  };
+
+  const patchComment = async (commentText) => {
+    const response = await fetch(`${apiUrl}/posts/${postId}/comment`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        commentText,
+        UserComment: loggedInUser,
+      }),
     });
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
 
-  const patchComment = async (commentText) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/comment`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          commentText,
-          UserComment: loggedInUser,
-        }),
-      }
-    );
-    const updatedPost = await response.json();
-    console.log(updatedPost);
-    dispatch(setPost({ post: updatedPost }));
-  };
-
   const deleteComment = async (commentId) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/deleteComment`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          commentId,
-        }),
-      }
-    );
+    const response = await fetch(`${apiUrl}/posts/${postId}/deleteComment`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        commentId,
+      }),
+    });
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
 
   const editComment = async (commentId, newComment) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/editComment`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          commentId,
-          newComment,
-        }),
-      }
-    );
+    const response = await fetch(`${apiUrl}/${postId}/editComment`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        commentId,
+        newComment,
+      }),
+    });
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
@@ -115,66 +109,61 @@ const PostWidget = ({
     replyCommentId,
     replyingTo
   ) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/replyComment`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          replyCommentText,
-          replyCommentId,
-          replyingTo,
-          UserReplyComment: loggedInUser,
-        }),
-      }
-    );
+    const response = await fetch(`${apiUrl}/posts/${postId}/replyComment`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        replyCommentText,
+        replyCommentId,
+        replyingTo,
+        UserReplyComment: loggedInUser,
+      }),
+    });
     const updatedPost = await response.json();
     console.log(updatedPost);
     dispatch(setPost({ post: updatedPost }));
   };
 
-  const deleteReplyComment = async (commentId) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/deleteReplyComment`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          commentId,
-        }),
-      }
-    );
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
-  };
+  // const deleteReplyComment = async (commentId) => {
+  //   const response = await fetch(
+  //     `${apiUrl}/posts/${postId}/deleteReplyComment`,
+  //     {
+  //       method: "PATCH",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         commentId,
+  //       }),
+  //     }
+  //   );
+  //   const updatedPost = await response.json();
+  //   dispatch(setPost({ post: updatedPost }));
+  // };
 
-  const editReplyComment = async (commentId, newComment) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/editReplyComment`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          commentId,
-          newComment,
-        }),
-      }
-    );
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
-  };
+  // const editReplyComment = async (commentId, newComment) => {
+  //   const response = await fetch(`${apiUrl}/posts/${postId}/editReplyComment`, {
+  //     method: "PUT",
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       commentId,
+  //       newComment,
+  //     }),
+  //   });
+  //   const updatedPost = await response.json();
+  //   dispatch(setPost({ post: updatedPost }));
+  // };
 
   return (
-    <WidgetWrapper m={trashPosts ? "0 0 2rem" : "1rem 0"}>
+    // 1rem 0
+    <WidgetWrapper m={"0 0 1rem"}>
       <Friend
         friendId={postUserId}
         name={name}

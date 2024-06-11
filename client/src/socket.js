@@ -31,7 +31,10 @@
 // };
 
 import { setOnlineUsers } from "Redux/Slice/app";
+import { addNotification } from "Redux/Slice/notification";
+import NotificationPopup from "components/NotificationPopUp";
 import { io } from "socket.io-client";
+import ReactDOM from "react-dom/client";
 
 let socket;
 
@@ -42,7 +45,7 @@ export const initializeSocket = (userId, dispatch) => {
   socket = io("http://localhost:3001/", {
     query: { userId },
     transports: ["websocket"], // Ensure WebSocket is used
-    reconnectionAttempts: 5, // Number of reconnection attempts
+    // reconnectionAttempts: 5, // Number of reconnection attempts
     reconnectionDelay: 1000, // Delay between reconnection attempts
   });
 
@@ -52,6 +55,17 @@ export const initializeSocket = (userId, dispatch) => {
 
   socket.on("getOnlineUsers", (users) => {
     dispatch(setOnlineUsers({ onlineUsers: users }));
+  });
+  socket.on("receiverNofi", (noti) => {
+    // toast.success(noti.message);
+    // <NotificationPopup notification={noti} />;
+
+    const popup = ReactDOM.createRoot(
+      document.getElementById("notification-root")
+    );
+    popup.render(<NotificationPopup notification={noti} />);
+    console.log(noti);
+    dispatch(addNotification(noti));
   });
 
   socket.on("disconnect", (reason) => {

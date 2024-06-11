@@ -69,7 +69,9 @@ const Chats = () => {
   //     headers: { Authorization: `Bearer ${token}` },
   //   });
   //   const conversations = await res.json();
+  //   console.log(conversations);
   //   setConversations(conversations);
+  //   dispatch(FetchDirectConversations({ conversations: conversations }));
   // };
 
   // // console.log(conversations);

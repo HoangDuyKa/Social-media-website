@@ -13,9 +13,7 @@ const ReplyButton = ({ functionality }) => {
       onClick={() => {
         functionality();
       }}
-    >
-      Reply
-    </Button>
+    ></Button>
   );
 };
 

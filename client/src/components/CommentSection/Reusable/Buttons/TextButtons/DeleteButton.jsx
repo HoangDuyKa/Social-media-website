@@ -13,9 +13,7 @@ const DeleteButton = ({ functionality }) => {
       onClick={() => {
         functionality();
       }}
-    >
-      Delete
-    </Button>
+    ></Button>
   );
 };
 

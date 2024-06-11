@@ -37,6 +37,7 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server Running on port ${PORT}`);
   connectToMongoDB();
+
   /* ADD DATA ONE TIME */
   // User.insertMany(users);
   // Post.insertMany(posts);

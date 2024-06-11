@@ -12,7 +12,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: [
+      process.env.NODE_ENV === "production"
+        ? process.env.CLIENT_URL
+        : "http://localhost:3000",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   },
 });
@@ -24,7 +28,6 @@ export const getReceiverSocketId = (receiverId) => {
 const userSocketMap = {}; // {userId: socketId}
 io.on("connection", async (socket) => {
   console.log("a user connected", socket.id);
-
   const userId = socket.handshake.query.userId;
   if (userId != "undefined") userSocketMap[userId] = socket.id;
 

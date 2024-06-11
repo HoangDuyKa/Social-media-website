@@ -6,6 +6,12 @@ import EditableReplyField from "./Reusable/Reply/EditableReplyField";
 
 const AddReply = ({ addReply, loggedInUserImage, commentId, replyingTo }) => {
   const [replyText, setReplyText] = useState("");
+
+  const handleSendReply = () => {
+    addReply(replyText, commentId, replyingTo);
+    setReplyText("");
+  };
+
   return (
     <>
       <Card>
@@ -22,11 +28,12 @@ const AddReply = ({ addReply, loggedInUserImage, commentId, replyingTo }) => {
               text={replyText}
             />
             <AddReplyButton
-              addReply={addReply}
+              // addReply={addReply}
               replyText={replyText}
-              setReplyText={setReplyText}
-              commentId={commentId}
-              replyingTo={replyingTo}
+              // setReplyText={setReplyText}
+              // commentId={commentId}
+              // replyingTo={replyingTo}
+              handleSendReply={handleSendReply}
             />
           </Stack>
         </Box>

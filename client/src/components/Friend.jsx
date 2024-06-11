@@ -176,7 +176,19 @@ const Friend = ({
               {name}
             </Typography>
           </Box>
-          <Typography color={medium} fontSize="0.75rem">
+          <Typography
+            sx={{
+              "&:hover": {
+                cursor: "pointer",
+                textDecoration: "underline",
+              },
+            }}
+            color={medium}
+            fontSize="0.75rem"
+            onClick={() => {
+              navigate(`/detail/post/${postId}`);
+            }}
+          >
             {subtitle}
           </Typography>
         </Box>

@@ -118,12 +118,10 @@ import {
   Typography,
   styled,
   useTheme,
-  alpha,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import StyledBadge from "./StyledBadge";
 import { SetCurrentConversation } from "Redux/Slice/conversation";
-import { useEffect, useState } from "react";
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   "&:hover": {

@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import FriendRequest from "../models/friendRequest.js";
 import bcrypt from "bcrypt";
+import { createNotifications } from "./notification.js";
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -38,6 +39,8 @@ export const addRemoveFriend = async (req, res) => {
     const { id, friendId } = req.params;
     const user = await User.findById(id);
     const friend = await User.findById(friendId);
+    const notificationMessage = `${user.firstName} sent you a friend request`;
+    const senderImage = user.picturePath;
 
     if (user.friends.includes(friendId)) {
       user.friends = user.friends.filter((id) => id !== friendId);
@@ -45,7 +48,18 @@ export const addRemoveFriend = async (req, res) => {
     } else {
       user.friends.push(friendId);
       friend.friends.push(id);
+
+      if (id !== user._id) {
+        createNotifications(
+          friendId,
+          senderImage,
+          "friend_request",
+          notificationMessage,
+          friendId
+        );
+      }
     }
+
     await user.save();
     await friend.save();
 

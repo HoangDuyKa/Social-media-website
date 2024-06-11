@@ -29,6 +29,7 @@ import FlexBetween from "components/FlexBetween";
 // import UserImage from "components/UserImage";
 import notificationSound from "assets/sounds/notification.mp3";
 import { getSocket } from "socket";
+import NotificationDropdown from "components/NotificationDropdown";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -104,7 +105,11 @@ const Navbar = () => {
           <IconButton onClick={() => navigate("/messages")}>
             <Message sx={{ color: dark, fontSize: "25px" }} />
           </IconButton>
-          <Notifications sx={{ fontSize: "25px" }} />
+          <IconButton>
+            {/* <Notifications sx={{ color: dark, fontSize: "25px" }} /> */}
+
+            <NotificationDropdown color={dark} fontSize={"25px"} />
+          </IconButton>
           <Help sx={{ fontSize: "25px" }} />
           <FormControl variant="standard" value={fullName}>
             {/* <UserImage image={user.picturePath} size="25px" /> */}

@@ -21,9 +21,10 @@ const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
   const logginUserId = useSelector((state) => state.auth.user);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const getUser = async () => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+    const response = await fetch(`${apiUrl}/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });

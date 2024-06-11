@@ -1,27 +1,43 @@
-import { Button } from "@mui/material";
+import { IconButton } from "@mui/material";
 import React from "react";
+import SendIcon from "@mui/icons-material/Send";
 
-const SendButton = ({ patchComment, setCommentTxt, commentTxt }) => {
+const SendButton = ({ handleSend, commentTxt }) => {
   return (
-    <Button
-      size="large"
+    <IconButton
+      color="primary"
+      onClick={handleSend}
+      disabled={!commentTxt.trim()}
       sx={{
-        bgcolor: "custom.moderateBlue",
-        color: "neutral.white",
-        p: "8px 25px",
+        bgcolor: "primary.main",
+        color: "white",
         "&:hover": {
-          bgcolor: "custom.lightGrayishBlue",
+          bgcolor: "primary.dark",
         },
       }}
-      onClick={(e) => {
-        !commentTxt.trim()
-          ? e.preventDefault()
-          : patchComment(commentTxt.trim());
-        setCommentTxt("");
-      }}
     >
-      Send
-    </Button>
+      <SendIcon />
+    </IconButton>
+
+    // <Button
+    //   size="large"
+    //   sx={{
+    //     bgcolor: "custom.moderateBlue",
+    //     color: "neutral.white",
+    //     p: "8px 25px",
+    //     "&:hover": {
+    //       bgcolor: "custom.lightGrayishBlue",
+    //     },
+    //   }}
+    //   onClick={(e) => {
+    //     !commentTxt.trim()
+    //       ? e.preventDefault()
+    //       : patchComment(commentTxt.trim());
+    //     setCommentTxt("");
+    //   }}
+    // >
+    //   Send
+    // </Button>
   );
 };
 

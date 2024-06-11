@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Avatar,
   Box,
   Button,
   TextField,
@@ -12,17 +11,16 @@ import FlexBetween from "components/FlexBetween";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import Dropzone from "react-dropzone";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "Redux/Slice/auth";
 
 const FormEditUser = ({ user, setEditUser }) => {
   const { palette } = useTheme();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const token = useSelector((state) => state.auth.token);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialValues = {
     firstName: user.firstName.trim(),
@@ -45,7 +43,7 @@ const FormEditUser = ({ user, setEditUser }) => {
         formData.append(value, values[value]);
       }
       const savedUserResponse = await fetch(
-        `http://localhost:3001/users/updateUser/${user._id}`,
+        `${apiUrl}/users/updateUser/${user._id}`,
         {
           method: "PUT",
           headers: {

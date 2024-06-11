@@ -14,6 +14,7 @@ import {
   deleteReplyComment,
   editReplyComment,
   createPost,
+  getDetailPost,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 import { upload } from "../utils/upload.js";
@@ -49,6 +50,7 @@ router.delete("/:id/force", verifyToken, destroyPost);
 
 /* READ */
 router.get("/:userId/posts", verifyToken, getUserPosts);
+router.get("/detail/:postId", verifyToken, getDetailPost);
 router.get("/:userId/trash", verifyToken, getUserTrash);
 router.get("/", verifyToken, getFeedPosts);
 

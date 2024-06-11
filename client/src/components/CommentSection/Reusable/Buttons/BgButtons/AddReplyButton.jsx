@@ -1,33 +1,49 @@
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 import React from "react";
 
 const AddReplyButton = ({
-  setReplyText,
-  addReply,
+  // setReplyText,
+  // addReply,
   replyText,
-  commentId,
-  replyingTo,
+  // commentId,
+  // replyingTo,
+  handleSendReply,
 }) => {
   return (
-    <Button
-      size="large"
+    // <Button
+    //   size="large"
+    //   sx={{
+    //     bgcolor: "custom.moderateBlue",
+    //     color: "neutral.white",
+    //     p: "8px 25px",
+    //     "&:hover": {
+    //       bgcolor: "custom.lightGrayishBlue",
+    //     },
+    //   }}
+    //   onClick={(e) => {
+    //     !replyText.trim()
+    //       ? e.preventDefault()
+    //       : addReply(replyText, commentId, replyingTo);
+    //     setReplyText("");
+    //   }}
+    // >
+    //   Reply
+    // </Button>
+    <IconButton
+      color="primary"
+      onClick={handleSendReply}
+      disabled={!replyText.trim()}
       sx={{
-        bgcolor: "custom.moderateBlue",
-        color: "neutral.white",
-        p: "8px 25px",
+        bgcolor: "primary.main",
+        color: "white",
         "&:hover": {
-          bgcolor: "custom.lightGrayishBlue",
+          bgcolor: "primary.dark",
         },
       }}
-      onClick={(e) => {
-        !replyText.trim()
-          ? e.preventDefault()
-          : addReply(replyText, commentId, replyingTo);
-        setReplyText("");
-      }}
     >
-      Reply
-    </Button>
+      <SendIcon />
+    </IconButton>
   );
 };
 
