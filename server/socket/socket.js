@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "https://connectu-lemon.vercel.app",
+      process.env.CLIENT_URL,
       // process.env.NODE_ENV === "production"
       //   ? process.env.CLIENT_URL
       //   : "http://localhost:3000",

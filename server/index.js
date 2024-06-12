@@ -28,7 +28,8 @@ app.use(morgan("dev"));
 // app.use(cors());
 app.use(
   cors({
-    origin: "https://connectu-lemon.vercel.app", // Replace with your frontend URL
+    // origin: "https://connectu-lemon.vercel.app", // Replace with your frontend URL
+    origin: process.env.CLIENT_URL, // Replace with your frontend URL
     credentials: true, // This is needed if you're sending cookies with requests
   })
 );
