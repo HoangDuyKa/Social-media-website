@@ -1,26 +1,29 @@
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
+import cors from "cors";
 import User from "../models/User.js";
 import FriendRequest from "../models/friendRequest.js";
 // import Message from "../models/message.js";
 import OneToOneMessage from "../models/OneToOneMessage.js";
 import Conversation from "../models/conversation.js";
-// import cors from "cors";
 
 const app = express();
-// app.use(cors());
+
+// Use CORS middleware
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: [
-      process.env.CLIENT_URL,
-      // "*",
-      // process.env.NODE_ENV === "production"
-      //   ? process.env.CLIENT_URL
-      //   : "http://localhost:3000",
-    ],
+    origin: [process.env.CLIENT_URL],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     // credentials: true,
   },

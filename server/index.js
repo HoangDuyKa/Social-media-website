@@ -27,24 +27,27 @@ app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use(morgan("dev"));
 
 // Middleware to manually set CORS headers
-app.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    // "https://connectu-lemon.vercel.app"
-    process.env.CLIENT_URL
-  ); // Replace with your frontend URL
-  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header("Access-Control-Allow-Credentials", "true"); // This is needed if you're sending cookies with requests
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header(
+//     "Access-Control-Allow-Origin",
+//     // "https://connectu-lemon.vercel.app"
+//     process.env.CLIENT_URL
+//   ); // Replace with your frontend URL
+//   res.header(
+//     "Access-Control-Allow-Methods",
+//     "GET,HEAD,OPTIONS,POST,PUT,PATCH,DELETE"
+//   );
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   res.header("Access-Control-Allow-Credentials", "true"); // This is needed if you're sending cookies with requests
+//   // Handle preflight requests
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(204);
+//   }
+//   next();
+// });
 // app.use(cors());
 
 // app.use(
