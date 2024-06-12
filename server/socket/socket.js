@@ -6,8 +6,10 @@ import FriendRequest from "../models/friendRequest.js";
 // import Message from "../models/message.js";
 import OneToOneMessage from "../models/OneToOneMessage.js";
 import Conversation from "../models/conversation.js";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 
 const server = http.createServer(app);
 const io = new Server(server, {
