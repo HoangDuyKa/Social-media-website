@@ -5,7 +5,8 @@
   "scripts": {
     "server": "nodemon index.js",
     "start": "node index.js",
-    "vercel-build": "npm install --legacy-peer-deps && npm run build"
+    "vercel-build": "npm install --legacy-peer-deps && npm run build",
+    "build": "npm install --legacy-peer-deps"
   },
   "keywords": [],
   "author": "",
