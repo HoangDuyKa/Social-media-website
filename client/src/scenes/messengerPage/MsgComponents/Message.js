@@ -13,7 +13,7 @@ import {
   FetchDirectConversations,
   setCurrentMessages,
 } from "Redux/Slice/conversation";
-import notificationSound from "assets/sounds/notification.mp3";
+import notificationSound from "assets/sounds/notificationMessage.mp3";
 import { getSocket } from "socket";
 
 // import { Chat_History } from "data";

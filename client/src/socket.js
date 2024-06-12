@@ -35,14 +35,16 @@ import { addNotification } from "Redux/Slice/notification";
 import NotificationPopup from "components/NotificationPopUp";
 import { io } from "socket.io-client";
 import ReactDOM from "react-dom/client";
+import notification from "assets/sounds/notification.mp3";
 
 let socket;
+const apiUrl = process.env.REACT_APP_API_URL;
 
 export const initializeSocket = (userId, dispatch) => {
   if (socket) {
     socket.disconnect();
   }
-  socket = io("http://localhost:3001/", {
+  socket = io(apiUrl, {
     query: { userId },
     transports: ["websocket"], // Ensure WebSocket is used
     // reconnectionAttempts: 5, // Number of reconnection attempts
@@ -59,6 +61,12 @@ export const initializeSocket = (userId, dispatch) => {
   socket.on("receiverNofi", (noti) => {
     // toast.success(noti.message);
     // <NotificationPopup notification={noti} />;
+    if (!document.hasFocus() || document.hasFocus()) {
+      const sound = new Audio(notification);
+      sound.play();
+      // console.log(newMessage);
+      // toast.success(newMessage.message);
+    }
 
     const popup = ReactDOM.createRoot(
       document.getElementById("notification-root")
