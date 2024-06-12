@@ -10,23 +10,19 @@ import Conversation from "../models/conversation.js";
 
 const app = express();
 
-// Use CORS middleware
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+// Cấu hình CORS
+const corsOptions = {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: [process.env.CLIENT_URL],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    // credentials: true,
-  },
+  cors: corsOptions,
 });
 
 export const getReceiverSocketId = (receiverId) => {
