@@ -25,7 +25,13 @@ app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "https://connectu-lemon.vercel.app", // Replace with your frontend URL
+    credentials: true, // This is needed if you're sending cookies with requests
+  })
+);
 // app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 // /* ROUTES */
