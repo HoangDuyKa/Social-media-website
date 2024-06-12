@@ -30,7 +30,7 @@ app.use(
   cors({
     // origin: "https://connectu-lemon.vercel.app", // Replace with your frontend URL
     origin: process.env.CLIENT_URL, // Replace with your frontend URL
-    credentials: true, // This is needed if you're sending cookies with requests
+    // credentials: true, // This is needed if you're sending cookies with requests
   })
 );
 // app.use("/assets", express.static(path.join(__dirname, "public/assets")));
