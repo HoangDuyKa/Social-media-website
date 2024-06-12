@@ -42,6 +42,7 @@ const Friend = ({
   const { _id } = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const { friends } = useSelector((state) => state.auth.user);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -52,16 +53,13 @@ const Friend = ({
   const isFriend = friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${apiUrl}/users/${_id}/${friendId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     const data = await response.json();
     console.log(data);
     dispatch(setFriends({ friends: data }));
@@ -69,7 +67,7 @@ const Friend = ({
 
   const softDeletePost = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+      const response = await fetch(`${apiUrl}/posts/${postId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -89,16 +87,13 @@ const Friend = ({
 
   const destroyPost = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/posts/${postId}/force`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/posts/${postId}/force`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error);
@@ -112,16 +107,13 @@ const Friend = ({
 
   const restorePost = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/posts/${postId}/restore`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/posts/${postId}/restore`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error);

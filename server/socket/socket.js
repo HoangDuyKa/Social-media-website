@@ -10,9 +10,8 @@ import Conversation from "../models/conversation.js";
 
 const app = express();
 
-// Cấu hình CORS
 const corsOptions = {
-  origin: "*",
+  origin: process.env.CLIENT_URL,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
