@@ -9,6 +9,7 @@ const initialState = {
   // all_users: [],
   friends: [], // all friends
   friendRequests: [], // all friend requests
+  searchResults: [], // all search results
 };
 
 export const appSlice = createSlice({
@@ -21,6 +22,9 @@ export const appSlice = createSlice({
 
     setPosts: (state, action) => {
       state.posts = action.payload.posts;
+    },
+    setSearchResults: (state, action) => {
+      state.searchResults = action.payload.searchResults;
     },
     setPost: (state, action) => {
       const updatedPosts = state.posts.map((post) => {
@@ -65,6 +69,7 @@ export const {
   updateRightBarType,
   setOnlineUsers,
   updateUsers,
+  setSearchResults,
 } = appSlice.actions;
 export default appSlice.reducer;
 

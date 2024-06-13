@@ -30,9 +30,11 @@ import FlexBetween from "components/FlexBetween";
 import notificationSound from "assets/sounds/notification.mp3";
 import { getSocket } from "socket";
 import NotificationDropdown from "components/NotificationDropdown";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  const [query, setQuery] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
@@ -44,10 +46,18 @@ const Navbar = () => {
   const background = theme.palette.background.default;
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
-
   const fullName = `${user.firstName} ${user.lastName}`;
 
   const socket = getSocket();
+
+  const handleSearch = () => {
+    // await handleSearch(query);
+    if (query.trim() !== "") {
+      navigate(`/results?query=${query}`);
+    } else {
+      toast.error("Please enter a name or email address");
+    }
+  };
 
   useEffect(() => {
     socket?.on("newMessage", (newMessage) => {
@@ -84,9 +94,13 @@ const Navbar = () => {
             gap="3rem"
             padding="0.1rem 1.5rem"
           >
-            <InputBase placeholder="Search..." />
+            <InputBase
+              placeholder="Search..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
             <IconButton>
-              <Search />
+              <Search onClick={handleSearch} />
             </IconButton>
           </FlexBetween>
         )}

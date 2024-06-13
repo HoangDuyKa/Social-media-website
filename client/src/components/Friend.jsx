@@ -36,6 +36,7 @@ const Friend = ({
   postUserId,
   postId,
   trashPosts,
+  userId,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -206,6 +207,8 @@ const Friend = ({
             restorePost={restorePost}
           />
         </IconButton>
+      ) : userId === _id ? (
+        <></>
       ) : (
         <IconButton
           onClick={() => patchFriend()}

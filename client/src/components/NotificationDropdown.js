@@ -65,7 +65,11 @@ const NotificationDropdown = ({ color, fontsize }) => {
       <Box>
         <IconButton onClick={handleClick}>
           <Badge
-            badgeContent={notifications.filter((n) => !n.isRead).length}
+            badgeContent={
+              notifications
+                ? notifications.filter((n) => !n.isRead).length
+                : null
+            }
             color="error"
           >
             <NotificationsIcon color={color} fontSize={fontsize} />
@@ -98,10 +102,10 @@ const NotificationDropdown = ({ color, fontsize }) => {
             },
           }}
         >
-          {notifications.length === 0 ? (
+          {notifications?.length === 0 ? (
             <MenuItem onClick={handleClose}>No notifications</MenuItem>
           ) : (
-            notifications.map((notification) => (
+            notifications?.map((notification) => (
               <MenuItem key={notification._id} onClick={handleClose}>
                 <NotificationItem notification={notification} />
               </MenuItem>

@@ -60,6 +60,10 @@ function App() {
               path="/detail/post/:postId"
               element={isAuth ? <DetailPost /> : <Navigate to="/login" />}
             />
+            <Route
+              path="/results"
+              element={isAuth ? <SearchPage /> : <Navigate to="/login" />}
+            />
             <Route path="/404" element={<Page404 />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
@@ -77,5 +81,6 @@ const Messenger = Loadable(lazy(() => import("scenes/messengerPage")));
 const Page404 = Loadable(lazy(() => import("scenes/404Page")));
 const TrashPost = Loadable(lazy(() => import("scenes/trashPostPage")));
 const DetailPost = Loadable(lazy(() => import("scenes/detailPost")));
+const SearchPage = Loadable(lazy(() => import("scenes/searchPage")));
 
 export default App;
