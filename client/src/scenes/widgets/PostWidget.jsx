@@ -10,6 +10,7 @@ import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "Redux/Slice/app";
 
@@ -42,66 +43,87 @@ const PostWidget = ({
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const patchLike = async () => {
-    const response = await fetch(`${apiUrl}/posts/${postId}/like`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: loggedInUserId, postUserId }),
-    });
-    const updatedPost = await response.json();
-    if (updatedPost.error) throw new Error(updatedPost.error);
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/like`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: loggedInUserId, postUserId }),
+      });
+      const updatedPost = await response.json();
+      if (updatedPost.error) throw new Error(updatedPost.error);
 
-    dispatch(setPost({ post: updatedPost }));
-    // dispatch(setPost({ post: updatedPost }));
+      dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const patchComment = async (commentText) => {
-    const response = await fetch(`${apiUrl}/posts/${postId}/comment`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        commentText,
-        UserComment: loggedInUser,
-      }),
-    });
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/comment`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentText,
+          UserComment: loggedInUser,
+        }),
+      });
+      const updatedPost = await response.json();
+      if (updatedPost.error) throw new Error(updatedPost.error);
+
+      dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const deleteComment = async (commentId) => {
-    const response = await fetch(`${apiUrl}/posts/${postId}/deleteComment`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        commentId,
-      }),
-    });
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/deleteComment`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId,
+        }),
+      });
+      const updatedPost = await response.json();
+      if (updatedPost.error) throw new Error(updatedPost.error);
+
+      dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const editComment = async (commentId, newComment) => {
-    const response = await fetch(`${apiUrl}/${postId}/editComment`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        commentId,
-        newComment,
-      }),
-    });
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
+    try {
+      const response = await fetch(`${apiUrl}/${postId}/editComment`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          commentId,
+          newComment,
+        }),
+      });
+      const updatedPost = await response.json();
+      if (updatedPost.error) throw new Error(updatedPost.error);
+
+      dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const patchReplyComment = async (
@@ -109,22 +131,26 @@ const PostWidget = ({
     replyCommentId,
     replyingTo
   ) => {
-    const response = await fetch(`${apiUrl}/posts/${postId}/replyComment`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        replyCommentText,
-        replyCommentId,
-        replyingTo,
-        UserReplyComment: loggedInUser,
-      }),
-    });
-    const updatedPost = await response.json();
-    console.log(updatedPost);
-    dispatch(setPost({ post: updatedPost }));
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/replyComment`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          replyCommentText,
+          replyCommentId,
+          replyingTo,
+          UserReplyComment: loggedInUser,
+        }),
+      });
+      const updatedPost = await response.json();
+      if (updatedPost.error) throw new Error(updatedPost.error);
+      dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   // const deleteReplyComment = async (commentId) => {

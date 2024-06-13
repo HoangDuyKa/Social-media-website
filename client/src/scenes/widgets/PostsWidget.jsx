@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "Redux/Slice/app";
 import PostWidget from "./PostWidget";
 import { Stack, Typography } from "@mui/material";
+import toast from "react-hot-toast";
 
 const PostsWidget = ({
   userId,
@@ -18,38 +19,66 @@ const PostsWidget = ({
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const getPosts = async () => {
-    const response = await fetch(`${apiUrl}/posts`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    try {
+      const response = await fetch(`${apiUrl}/posts`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const getUserPosts = async () => {
-    const response = await fetch(`${apiUrl}/posts/${userId}/posts`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    try {
+      const response = await fetch(`${apiUrl}/posts/${userId}/posts`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
   const getUserTrash = async () => {
-    const response = await fetch(`${apiUrl}/posts/${userId}/trash`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    try {
+      const response = await fetch(`${apiUrl}/posts/${userId}/trash`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const getDetailPost = async () => {
-    const response = await fetch(`${apiUrl}/posts/detail/${postId}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    try {
+      const response = await fetch(`${apiUrl}/posts/detail/${postId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {

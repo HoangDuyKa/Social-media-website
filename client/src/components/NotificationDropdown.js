@@ -16,6 +16,7 @@ import {
 } from "Redux/Slice/notification";
 import { getSocket } from "socket";
 import NotificationItem from "./NotificationItem";
+import toast from "react-hot-toast";
 
 const NotificationDropdown = ({ color, fontsize }) => {
   const dispatch = useDispatch();
@@ -26,11 +27,15 @@ const NotificationDropdown = ({ color, fontsize }) => {
 
   useEffect(() => {
     const fetchNotifications = async (userId) => {
-      const response = await fetch(`${apiUrl}/notifications/${userId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
+      try {
+        const response = await fetch(`${apiUrl}/notifications/${userId}`);
+        if (response.error) {
+          throw new Error("Failed to fetch notifications");
+        }
+        return response.json();
+      } catch (error) {
+        toast.error(error.message);
       }
-      return response.json();
     };
     const fetchUserNotifications = async () => {
       const userId = userAuth._id; // Get userId from your auth state

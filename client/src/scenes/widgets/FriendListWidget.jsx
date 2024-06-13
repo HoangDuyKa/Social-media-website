@@ -2,6 +2,7 @@ import { Box, Typography, useTheme } from "@mui/material";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "Redux/Slice/auth";
 
@@ -13,12 +14,19 @@ const FriendListWidget = ({ userId, style }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const getFriends = async () => {
-    const response = await fetch(`${apiUrl}/users/${userId}/friends`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setFriends({ friends: data }));
+    try {
+      const response = await fetch(`${apiUrl}/users/${userId}/friends`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setFriends({ friends: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {

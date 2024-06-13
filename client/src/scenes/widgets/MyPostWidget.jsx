@@ -80,7 +80,6 @@ const MyPostWidget = ({ picturePath }) => {
 
       const posts = await response.json();
       if (posts.error) {
-        setIsLoading(false);
         throw new Error(posts.error);
       }
       // console.log(posts);
@@ -95,6 +94,7 @@ const MyPostWidget = ({ picturePath }) => {
       setIsLoading(false);
       toast.success("Post was Successfully");
     } catch (error) {
+      setIsLoading(false);
       toast.error(error.message);
     }
   };

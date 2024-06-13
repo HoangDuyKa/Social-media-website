@@ -18,6 +18,7 @@ import {
 } from "@mui/icons-material";
 import { markAsRead } from "Redux/Slice/notification";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 const NotificationItem = ({ notification }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -25,25 +26,29 @@ const NotificationItem = ({ notification }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const handleMarkAsRead = async (id) => {
-    const response = await fetch(
-      `${apiUrl}/notifications/updateNotification/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ isRead: true }),
+    try {
+      const response = await fetch(
+        `${apiUrl}/notifications/updateNotification/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ isRead: true }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update notification status");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Failed to update notification status");
+      const updatedNotification = await response.json();
+      dispatch(markAsRead(id));
+      return updatedNotification;
+    } catch (error) {
+      toast.error(error.message);
     }
-
-    const updatedNotification = await response.json();
-    dispatch(markAsRead(id));
-    return updatedNotification;
   };
 
   const handleClickNotification = () => {

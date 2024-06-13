@@ -25,6 +25,7 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentMessages } from "Redux/Slice/conversation";
+import toast from "react-hot-toast";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "&.MuiInputBase-input": {
@@ -179,7 +180,7 @@ const ChatFooter = () => {
         setCurrentMessages({ current_messages: [...current_messages, data] })
       );
     } catch (error) {
-      console.log(error.message);
+      toast.error(error.message);
     }
   };
   const handleChangeMessage = (e) => {

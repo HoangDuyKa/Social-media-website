@@ -11,6 +11,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
   const [user, setUser] = useState(null);
@@ -24,12 +25,18 @@ const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const getUser = async () => {
-    const response = await fetch(`${apiUrl}/users/${userId}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    setUser(data);
+    try {
+      const response = await fetch(`${apiUrl}/users/${userId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      setUser(data);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {

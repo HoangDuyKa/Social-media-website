@@ -53,16 +53,20 @@ const Friend = ({
   const isFriend = friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
-    const response = await fetch(`${apiUrl}/users/${_id}/${friendId}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-    dispatch(setFriends({ friends: data }));
+    try {
+      const response = await fetch(`${apiUrl}/users/${_id}/${friendId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      dispatch(setFriends({ friends: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const softDeletePost = async () => {

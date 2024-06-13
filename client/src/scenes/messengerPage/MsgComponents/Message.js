@@ -15,6 +15,7 @@ import {
 } from "Redux/Slice/conversation";
 import notificationSound from "assets/sounds/notificationMessage.mp3";
 import { getSocket } from "socket";
+import toast from "react-hot-toast";
 
 // import { Chat_History } from "data";
 
@@ -48,7 +49,7 @@ const Message = ({ menu, nonedisplay }) => {
         console.log(data);
         dispatch(setCurrentMessages({ current_messages: data }));
       } catch (error) {
-        console.log(error.message);
+        toast.error(error.message);
       } finally {
       }
     };

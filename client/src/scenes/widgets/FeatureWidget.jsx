@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FriendListWidget from "./FriendListWidget";
 import Friends from "scenes/Dialog/FriendsDialog";
+import toast from "react-hot-toast";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -36,12 +37,20 @@ const UserWidget = ({ userId, picturePath }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const getUser = async () => {
-    const response = await fetch(`${apiUrl}/users/${userId}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    setUser(data);
+    try {
+      const response = await fetch(`${apiUrl}/users/${userId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      setUser(data);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
