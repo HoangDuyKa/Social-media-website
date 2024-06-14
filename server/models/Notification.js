@@ -6,14 +6,15 @@ const NotificationSchema = new mongoose.Schema({
     ref: "Post",
     required: true,
   },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId :{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userSender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   //   sender: {
   //     type: mongoose.Schema.ObjectId,
   //     ref: "User",
   //     required: true,
   //   },
   //   senderName: { type: String, required: true },
-  senderImage: { type: String, required: true },
+  // senderImage: { type: String, required: true },
   type: {
     type: String,
     enum: ["friend_request", "like", "comment"],

@@ -108,26 +108,46 @@ const PostsWidget = ({
       ) : (
         posts.map(
           ({
+            // _id,
+            // userId,
+            // firstName,
+            // lastName,
+            // description,
+            // location,
+            // file,
+            // userPicturePath,
+            // likes,
+            // comments,
             _id,
-            userId,
-            firstName,
-            lastName,
+            userPost,
             description,
-            location,
             file,
-            userPicturePath,
             likes,
             comments,
           }) => (
+            // <PostWidget
+            //   key={_id}
+            //   postId={_id}
+            //   postUserId={userId}
+            //   name={`${firstName} ${lastName}`}
+            //   description={description}
+            //   location={location}
+            //   file={file}
+            //   userPicturePath={userPicturePath}
+            //   likes={likes}
+            //   comments={comments}
+            //   trashPosts={trashPosts}
+            //   detailPost={detailPost}
+            // />
             <PostWidget
               key={_id}
               postId={_id}
-              postUserId={userId}
-              name={`${firstName} ${lastName}`}
+              postUserId={userPost?._id}
+              name={`${userPost?.firstName} ${userPost?.lastName}`}
               description={description}
-              location={location}
+              location={userPost?.location}
               file={file}
-              userPicturePath={userPicturePath}
+              userPicturePath={userPost?.picturePath}
               likes={likes}
               comments={comments}
               trashPosts={trashPosts}

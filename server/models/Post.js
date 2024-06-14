@@ -3,18 +3,20 @@ import mongooseDelete from "mongoose-delete";
 
 const postSchema = mongoose.Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-    },
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
+    // userId: {
+    //   type: String,
+    //   required: true,
+    // },
+    // firstName: {
+    //   type: String,
+    //   required: true,
+    // },
+    // lastName: {
+    //   type: String,
+    //   required: true,
+    // },
+    // userPicturePath: String,
+    userPost : {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     location: String,
     description: String,
     file: {
@@ -22,7 +24,6 @@ const postSchema = mongoose.Schema(
       fileType: String,
       fileName: String,
     },
-    userPicturePath: String,
     likes: {
       type: Map,
       of: Boolean,

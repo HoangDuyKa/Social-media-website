@@ -10,11 +10,8 @@ import {
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
-  addNotification,
-  markAsRead,
   setNotifications,
 } from "Redux/Slice/notification";
-import { getSocket } from "socket";
 import NotificationItem from "./NotificationItem";
 import toast from "react-hot-toast";
 

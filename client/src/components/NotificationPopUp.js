@@ -110,7 +110,7 @@ const NotificationPopup = ({ notification }) => {
           }}
         >
           <Avatar
-            src={notification.senderImage}
+            src={notification.userSender.picturePath}
             alt="User"
             sx={{ width: 56, height: 56, marginRight: 2 }}
           />

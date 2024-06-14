@@ -89,7 +89,7 @@ const NotificationItem = ({ notification }) => {
           horizontal: "right",
         }}
       >
-        <Avatar src={notification.senderImage} alt="Sender" />
+        <Avatar src={notification.userSender.picturePath} alt="Sender" />
       </Badge>
       <Box ml={2} flexGrow={1}>
         <Typography

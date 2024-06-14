@@ -27,6 +27,7 @@ const PostWidget = ({
   trashPosts,
   detailPost,
 }) => {
+  console.log(postUserId)
   const [isComments, setIsComments] = useState(detailPost);
   const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
   const dispatch = useDispatch();

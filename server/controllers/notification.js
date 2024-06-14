@@ -3,12 +3,13 @@ import User from "../models/User.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const createNotifications = async (
-  id,
-  senderImage,
-  type,
-  message,
-  receiverNotification,
-  navigator = ""
+  id, // id of placeId
+  // senderImage,
+  userSender, //id of sender notification
+  type, // type of notification
+  message, // message of notification
+  receiverNotification, // who receive notifcation
+  navigator = "" // navigate to ?
 ) => {
   //   try {
   //     const place = await Notification.find();
@@ -57,8 +58,9 @@ export const createNotifications = async (
       { placeId: id },
       {
         placeId: id, //the place where the notification looking for is located
-        userId: receiverNotification,
-        senderImage,
+        userSender,
+        userId:receiverNotification,
+        // senderImage,
         type,
         message,
         isRead: false,
@@ -66,7 +68,7 @@ export const createNotifications = async (
         createdAt: new Date(), // Set the current date and time
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
+    ).populate("userSender","_id firstName lastName picturePath location");
 
     // Emit the notification to the receiver if they are connected
     const receiverSocketId = getReceiverSocketId(receiverNotification);
@@ -84,9 +86,10 @@ export const createNotifications = async (
 export const getNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
-    const notifications = await Notification.find({ userId }).sort({
+    const notifications = await Notification.find({ userId }).populate("userSender","_id firstName lastName picturePath location").sort({
       createdAt: -1,
     });
+    console.log(notifications)
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -102,7 +105,7 @@ export const updateNotificationStatus = async (req, res) => {
       id,
       { isRead },
       { new: true }
-    );
+    ).populate("userSender","_id firstName lastName picturePath location");
 
     if (!notification) {
       return res.status(404).json({ message: "Notification not found" });

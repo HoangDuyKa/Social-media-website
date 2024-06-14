@@ -13,14 +13,15 @@ export const createPost = async (req, res) => {
       filePath = req.file.path;
     }
 
-    const user = await User.findById(userId);
+    // const user = await User.findById(userId);
     const newPost = new Post({
-      userId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      location: user.location,
+      // userId,
+      // firstName: user.firstName,
+      // lastName: user.lastName,
+      // location: user.location,
+      // userPicturePath: user.picturePath,
+      userPost:userId,
       description,
-      userPicturePath: user.picturePath,
       file: {
         path: filePath,
         fileType: fileType,
@@ -31,7 +32,7 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find().sort({ createdAt: -1 });
+    const post = await Post.find().populate("userPost","_id firstName lastName picturePath location").sort({ createdAt: -1 });
     res.status(201).json(post);
   } catch (err) {
     res.status(409).json({ error: err.message });
@@ -41,7 +42,7 @@ export const createPost = async (req, res) => {
 /* READ */
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find();
+    const post = await Post.find().populate("userPost","_id firstName lastName picturePath location");
     // const post = await Post.aggregate([
     //   // { $match: { userId: mongoose.Types.ObjectId(userId) } },
     //   { $sample: { size: 10 } }, // Bạn có thể thay đổi size tùy thuộc vào số lượng bài viết bạn muốn lấy
@@ -55,7 +56,7 @@ export const getFeedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.find({ userId }).sort({ createdAt: -1 });
+    const post = await Post.find({ userId }).populate("userPost","_id firstName lastName picturePath location").sort({ createdAt: -1 });
     res.status(200).json(post);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -65,7 +66,7 @@ export const getUserPosts = async (req, res) => {
 export const getUserTrash = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.findWithDeleted({ deleted: true });
+    const post = await Post.findWithDeleted({ deleted: true }).populate("userPost","_id firstName lastName picturePath location");;
 
     const deletedPost = post.filter((post) => post.userId === userId);
     res.status(200).json(deletedPost);
@@ -78,7 +79,7 @@ export const getDetailPost = async (req, res) => {
   try {
     const { postId } = req.params;
     console.log("postId: " + postId);
-    const post = await Post.find({ _id: postId });
+    const post = await Post.find({ _id: postId }).populate("userPost","_id firstName lastName picturePath location");
 
     console.log("post", post);
     res.status(200).json(post);
@@ -96,7 +97,7 @@ export const likePost = async (req, res) => {
     const isLiked = post.likes.get(userId);
     const user = await User.findById(userId);
     const notificationMessage = `${user.firstName} has liked your post`;
-    const senderImage = user.picturePath;
+    // const senderImage = user.picturePath;
     const navigator = `/detail/post/${id}`;
 
     if (isLiked) {
@@ -106,7 +107,7 @@ export const likePost = async (req, res) => {
       if (userId !== postUserId) {
         createNotifications(
           id,
-          senderImage,
+          userId,
           "like",
           notificationMessage,
           postUserId,
@@ -118,7 +119,7 @@ export const likePost = async (req, res) => {
       id,
       { likes: post.likes },
       { new: true }
-    );
+    ).populate("userPost","_id firstName lastName picturePath location");
 
     res.status(200).json(updatedPost);
   } catch (err) {
@@ -132,6 +133,7 @@ export const commentPost = async (req, res) => {
     const { UserComment, commentText } = req.body;
     const post = await Post.findById(id);
     const navigator = `/detail/post/${id}`;
+    console.log(UserComment)
 
     const updatedPost = await Post.findByIdAndUpdate(
       id,
@@ -149,16 +151,17 @@ export const commentPost = async (req, res) => {
         ],
       },
       { new: true }
-    );
+    )
+    // .populate("userSender","_id firstName lastName picturePath location");
     const notificationMessage = `${UserComment.firstName} had commented your post`;
 
     if (UserComment._id !== post.userId) {
       createNotifications(
         UserComment._id,
-        UserComment.picturePath,
+        UserComment._id,
         "comment",
         notificationMessage,
-        post.userId,
+        post.userPost,
         navigator
       );
     }
