@@ -19,14 +19,14 @@ import {
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Dropzone from "react-dropzone";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "Redux/Slice/app";
 
-const MyPostWidget = ({ picturePath }) => {
+const MyPostWidget = ({}) => {
   const dispatch = useDispatch();
   // const [isImage, setIsImage] = useState(false);
   // const [image, setImage] = useState(null);
@@ -38,7 +38,7 @@ const MyPostWidget = ({ picturePath }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [post, setPost] = useState("");
   const { palette } = useTheme();
-  const { _id } = useSelector((state) => state.auth.user);
+  const { user } = useSelector((state) => state.auth);
   const token = useSelector((state) => state.auth.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
@@ -54,7 +54,7 @@ const MyPostWidget = ({ picturePath }) => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("userId", _id);
+      formData.append("userId", user._id);
       formData.append("description", post);
       if (file) {
         formData.append("file", file);
@@ -102,7 +102,7 @@ const MyPostWidget = ({ picturePath }) => {
   return (
     <WidgetWrapper sx={{ m: "0 0 1rem" }}>
       <FlexBetween gap="1.5rem">
-        <UserImage image={picturePath} />
+        <UserImage image={user.picturePath} />
         <InputBase
           placeholder="What's on your mind..."
           onChange={(e) => setPost(e.target.value)}

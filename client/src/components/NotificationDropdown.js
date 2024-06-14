@@ -13,7 +13,7 @@ import {
   setNotifications,
 } from "Redux/Slice/notification";
 import NotificationItem from "./NotificationItem";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const NotificationDropdown = ({ color, fontsize }) => {
   const dispatch = useDispatch();

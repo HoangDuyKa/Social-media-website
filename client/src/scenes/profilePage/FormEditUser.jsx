@@ -11,7 +11,7 @@ import FlexBetween from "components/FlexBetween";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import Dropzone from "react-dropzone";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "Redux/Slice/auth";
 

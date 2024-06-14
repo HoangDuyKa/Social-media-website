@@ -35,6 +35,7 @@ import { addNotification } from "Redux/Slice/notification";
 import NotificationPopup from "components/NotificationPopUp";
 import { io } from "socket.io-client";
 import ReactDOM from "react-dom/client";
+import { toast } from "sonner";
 import notification from "assets/sounds/notification.mp3";
 
 let socket;
@@ -67,12 +68,13 @@ export const initializeSocket = (userId, dispatch) => {
       // console.log(newMessage);
       // toast.success(newMessage.message);
     }
+    toast(<NotificationPopup notification={noti} />);
 
-    const popup = ReactDOM.createRoot(
-      document.getElementById("notification-root")
-    );
-    popup.render(<NotificationPopup notification={noti} />);
-    console.log(noti);
+    // const popup = ReactDOM.createRoot(
+    //   document.getElementById("notification-root")
+    // );
+    // popup.render(<NotificationPopup notification={noti} />);
+    // console.log(noti);
     dispatch(addNotification(noti));
   });
 

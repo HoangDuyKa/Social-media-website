@@ -10,7 +10,7 @@ import FlexBetween from "components/FlexBetween";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "Redux/Slice/app";
 
@@ -27,7 +27,6 @@ const PostWidget = ({
   trashPosts,
   detailPost,
 }) => {
-  console.log(postUserId)
   const [isComments, setIsComments] = useState(detailPost);
   const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
   const dispatch = useDispatch();
@@ -72,10 +71,11 @@ const PostWidget = ({
         },
         body: JSON.stringify({
           commentText,
-          UserComment: loggedInUser,
+          userComment: loggedInUser._id,
         }),
       });
       const updatedPost = await response.json();
+      console.log(updatedPost);
       if (updatedPost.error) throw new Error(updatedPost.error);
 
       dispatch(setPost({ post: updatedPost }));
@@ -107,7 +107,7 @@ const PostWidget = ({
 
   const editComment = async (commentId, newComment) => {
     try {
-      const response = await fetch(`${apiUrl}/${postId}/editComment`, {
+      const response = await fetch(`${apiUrl}/posts/${postId}/editComment`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -119,6 +119,7 @@ const PostWidget = ({
         }),
       });
       const updatedPost = await response.json();
+      console.log(updatedPost);
       if (updatedPost.error) throw new Error(updatedPost.error);
 
       dispatch(setPost({ post: updatedPost }));
@@ -143,7 +144,7 @@ const PostWidget = ({
           replyCommentText,
           replyCommentId,
           replyingTo,
-          UserReplyComment: loggedInUser,
+          userReplyComment: loggedInUser._id,
         }),
       });
       const updatedPost = await response.json();

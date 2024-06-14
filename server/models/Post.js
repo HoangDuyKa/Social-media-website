@@ -1,6 +1,22 @@
 import mongoose from "mongoose";
 import mongooseDelete from "mongoose-delete";
 
+const commentSchema = new mongoose.Schema({
+  userComment: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  commentText: String,
+  createdAt: Date,
+  updatedAt: Date,
+  replies: [
+    {
+      replyId: mongoose.Schema.Types.ObjectId,
+      userReply: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      replyText: String,
+      createdAt: Date,
+      updatedAt: Date,
+    },
+  ],
+});
+
 const postSchema = mongoose.Schema(
   {
     // userId: {
@@ -16,7 +32,11 @@ const postSchema = mongoose.Schema(
     //   required: true,
     // },
     // userPicturePath: String,
-    userPost : {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+    userPost: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     location: String,
     description: String,
     file: {
@@ -28,10 +48,7 @@ const postSchema = mongoose.Schema(
       type: Map,
       of: Boolean,
     },
-    comments: {
-      type: Array,
-      default: [],
-    },
+    comments: [commentSchema],
   },
   { timestamps: true }
 );

@@ -30,7 +30,7 @@ import FlexBetween from "components/FlexBetween";
 import notificationSound from "assets/sounds/notification.mp3";
 import { getSocket } from "socket";
 import NotificationDropdown from "components/NotificationDropdown";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);

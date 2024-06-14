@@ -22,7 +22,7 @@ const Core = ({
         {comments.map((comment) => {
           return (
             <Comment
-              key={comment.id}
+              key={comment._id}
               onPass={comment}
               deleteComment={deleteComment}
               editComment={editComment}

@@ -208,8 +208,8 @@ const Comment = ({
   postUserId,
   patchReplyComment,
 }) => {
-  const { commentText, UserComment, replies, commentId, createdAt } = onPass;
-  const userName = `${UserComment.firstName} ${UserComment.lastName}`;
+  const { commentText, userComment, replies, _id, createdAt } = onPass;
+  const userName = `${userComment.firstName} ${userComment.lastName}`;
   const loggedInUser = useSelector((state) => state.auth.user);
   const [clicked, setClicked] = useState(false);
   const [editingComment, setEditingComment] = useState(false);
@@ -232,7 +232,7 @@ const Comment = ({
       <ConfirmDelete
         onOpen={openModal}
         onClose={handleClose}
-        id={commentId}
+        id={_id}
         deleteComment={deleteComment}
       />
       <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -251,20 +251,20 @@ const Comment = ({
                       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                       variant="dot"
                     >
-                      <Avatar src={UserComment.picturePath} />
+                      <Avatar src={userComment.picturePath} />
                     </StyledBadge>
                   ) : (
-                    <Avatar src={UserComment.picturePath} />
+                    <Avatar src={userComment.picturePath} />
                   )}
                   <Username
                     userName={userName}
-                    UserComment={UserComment}
+                    UserComment={userComment}
                     loggedInUserId={loggedInUser._id}
                   />
                   <CreatedAt createdAt={createdAt} />
                 </Stack>
                 <Stack direction="row" spacing={1}>
-                  {loggedInUser._id === UserComment._id ? (
+                  {loggedInUser._id === userComment._id ? (
                     <>
                       <IconButton size="small" onClick={handleOpen}>
                         <DeleteIcon fontSize="small" />
@@ -320,7 +320,7 @@ const Comment = ({
                         p: "4px 16px",
                       }}
                       onClick={() => {
-                        editComment(commentId, commentTextInput);
+                        editComment(_id, commentTextInput);
                         setEditingComment(!editComment);
                       }}
                     >
@@ -341,7 +341,7 @@ const Comment = ({
         replyingTo={userName}
         loggedInUserImage={loggedInUser.picturePath}
         patchReplyComment={patchReplyComment}
-        commentId={commentId}
+        commentId={_id}
       />
     </>
   );

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "Redux/Slice/app";
 import PostWidget from "./PostWidget";
 import { Stack, Typography } from "@mui/material";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const PostsWidget = ({
   userId,

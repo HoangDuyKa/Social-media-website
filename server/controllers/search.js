@@ -22,7 +22,15 @@ export const getSearchs = async (req, res) => {
       // Tìm kiếm bài viết theo mô tả
       posts = await Post.find({
         description: { $regex: query, $options: "i" },
-      });
+      })
+        .populate({
+          path: "comments.userComment",
+          select: "_id firstName lastName picturePath location",
+        })
+        .populate({
+          path: "userPost",
+          select: "_id firstName lastName picturePath location",
+        });
     } else {
       const firstNameQuery = nameParts[0];
       const lastNameQuery = nameParts.slice(1).join(" ");
@@ -38,9 +46,18 @@ export const getSearchs = async (req, res) => {
       // Tìm kiếm bài viết theo mô tả
       posts = await Post.find({
         description: { $regex: query, $options: "i" },
-      });
+      })
+        .populate({
+          path: "comments.userComment",
+          select: "_id firstName lastName picturePath location",
+        })
+        .populate({
+          path: "userPost",
+          select: "_id firstName lastName picturePath location",
+        });
     }
 
+    console.log(posts, users);
     res.status(200).json({ users, posts });
   } catch (err) {
     res.status(500).json({ error: err.message });

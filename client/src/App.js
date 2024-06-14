@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import LoadingScreen from "./components/LoadingScreen";
@@ -69,7 +69,8 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
-      <Toaster />
+      <Toaster position="top-right" richColors closeButton />
+      {/* <Toaster position="bottom-left" richColors closeButton /> */}
     </div>
   );
 }

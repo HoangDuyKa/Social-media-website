@@ -12,14 +12,14 @@ import { Box, Typography, Divider, useTheme, IconButton } from "@mui/material";
 import UserImage from "components/UserImage";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FriendListWidget from "./FriendListWidget";
 import Friends from "scenes/Dialog/FriendsDialog";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
-const UserWidget = ({ userId, picturePath }) => {
+const UserWidget = ({ userId }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleCloseDialog = () => {
@@ -77,7 +77,7 @@ const UserWidget = ({ userId, picturePath }) => {
         {/* FIRST ROW */}
         <FlexBetween gap="0.5rem" pb="1.1rem">
           <FlexBetween gap="1rem">
-            <UserImage image={picturePath} />
+            <UserImage image={user.picturePath} />
             <Box>
               <Typography
                 variant="h4"

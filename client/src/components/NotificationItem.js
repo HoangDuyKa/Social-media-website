@@ -18,7 +18,8 @@ import {
 } from "@mui/icons-material";
 import { markAsRead } from "Redux/Slice/notification";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+
 const NotificationItem = ({ notification }) => {
   const dispatch = useDispatch();
   const theme = useTheme();

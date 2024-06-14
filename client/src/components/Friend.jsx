@@ -19,13 +19,14 @@ import { Restore } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "../Redux/Slice/auth";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 import StyledBadge from "./StyledBadge";
 import { DotsThreeVertical } from "phosphor-react";
 import { useState } from "react";
-import { setPost, setPosts } from "Redux/Slice/app";
+import { setPosts } from "Redux/Slice/app";
 
 const Friend = ({
   friendId,
@@ -173,21 +174,27 @@ const Friend = ({
               {name}
             </Typography>
           </Box>
-          <Typography
-            sx={{
-              "&:hover": {
-                cursor: "pointer",
-                textDecoration: "underline",
-              },
-            }}
-            color={medium}
-            fontSize="0.75rem"
-            onClick={() => {
-              navigate(`/detail/post/${postId}`);
-            }}
-          >
-            {subtitle}
-          </Typography>
+          {postId ? (
+            <Typography
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                },
+              }}
+              color={medium}
+              fontSize="0.75rem"
+              onClick={() => {
+                navigate(`/detail/post/${postId}`);
+              }}
+            >
+              {subtitle}
+            </Typography>
+          ) : (
+            <Typography color={medium} fontSize="0.75rem">
+              {subtitle}
+            </Typography>
+          )}
         </Box>
       </FlexBetween>
       {postId ? (

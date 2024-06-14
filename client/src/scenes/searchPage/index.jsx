@@ -230,11 +230,11 @@ const SearchPage = () => {
                     {posts.map((post) => (
                       //   <PostSearch key={post._id} post={post} />
                       <PostWidget
-                        name={`${post.firstName} ${post.lastName}`}
+                        name={`${post.userPost.firstName} ${post.userPost.lastName}`}
                         description={post.description}
                         location
                         file={post.file}
-                        userPicturePath={post.userPicturePath}
+                        userPicturePath={post.userPost.picturePath}
                         comments={post.comments}
                         postId={post._id}
                         likes={post.likes}
