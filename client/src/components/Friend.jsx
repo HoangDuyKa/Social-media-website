@@ -5,6 +5,7 @@ import {
   PersonRemoveOutlined,
   Public,
   ReportGmailerrorred,
+  Save,
 } from "@mui/icons-material";
 import {
   Box,
@@ -37,7 +38,9 @@ const Friend = ({
   postUserId,
   postId,
   trashPosts,
+  storagePage,
   userId,
+  isAnniversaryPost,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -130,6 +133,49 @@ const Friend = ({
     }
   };
 
+  const savePost = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/save`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: _id,
+        }),
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      toast.success("Save Post Successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  const unsavePost = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/unsave`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: _id,
+        }),
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      toast.success("Unsave Post Successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const onlineUsers = useSelector((state) => state.app.onlineUsers);
 
   const online = onlineUsers.includes(friendId);
@@ -212,6 +258,10 @@ const Friend = ({
             softDeletePost={softDeletePost}
             destroyPost={destroyPost}
             restorePost={restorePost}
+            savePost={savePost}
+            storagePage={storagePage}
+            unsavePost={unsavePost}
+            isAnniversaryPost={isAnniversaryPost}
           />
         </IconButton>
       ) : userId === _id ? (
@@ -241,6 +291,10 @@ const PostOption = ({
   softDeletePost,
   destroyPost,
   restorePost,
+  savePost,
+  storagePage,
+  unsavePost,
+  isAnniversaryPost,
 }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -271,12 +325,22 @@ const PostOption = ({
     : postUserId !== _id
     ? [
         {
+          title: storagePage ? "Unsave Post" : "Save this Post",
+          handleClick: () => {
+            storagePage
+              ? unsavePost().then(navigate("/"))
+              : savePost().then(handleClose);
+          },
+          icon: storagePage ? <Delete /> : <Save />,
+        },
+        {
           title: isFriend ? "Remove Friend" : "Add Friend",
           handleClick: () => {
             patchFriend().then(handleClose);
           },
           icon: isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />,
         },
+
         {
           title: "Report",
           icon: <ReportGmailerrorred />,
@@ -290,7 +354,9 @@ const PostOption = ({
         {
           title: "Delete Post",
           handleClick: () => {
-            softDeletePost().then(handleClose);
+            isAnniversaryPost
+              ? destroyPost().then(navigate("/"))
+              : softDeletePost().then(handleClose);
           },
           icon: <Delete />,
         },

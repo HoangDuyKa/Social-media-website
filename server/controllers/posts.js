@@ -3,6 +3,7 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 // import { getReceiverSocketId, io } from "../socket/socket.js";
 import { createNotifications } from "./notification.js";
+import SavePost from "../models/SavePost.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
@@ -32,7 +33,7 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find()
+    const post = await Post.find({ isAnniversaryPost: false })
       .populate("userPost", "_id firstName lastName picturePath location")
       .sort({ createdAt: -1 });
     res.status(201).json(post);
@@ -44,7 +45,7 @@ export const createPost = async (req, res) => {
 /* READ */
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find()
+    const post = await Post.find({ isAnniversaryPost: false })
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
@@ -63,7 +64,7 @@ export const getFeedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.find({ userPost: userId })
+    const post = await Post.find({ userPost: userId, isAnniversaryPost: false })
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
@@ -79,7 +80,9 @@ export const getUserPosts = async (req, res) => {
 export const getUserTrash = async (req, res) => {
   try {
     const { userId } = req.params;
-    const posts = await Post.findWithDeleted({ deleted: true })
+    const posts = await Post.findWithDeleted({
+      deleted: true,
+    })
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
@@ -90,6 +93,53 @@ export const getUserTrash = async (req, res) => {
       (post) => post.userPost._id.toString() === userId
     );
     res.status(200).json(deletedPost);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+export const getUserStorage = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const savedPosts = await SavePost.find({
+      userSave: userId,
+      isAnniversaryPost: false,
+    })
+      .populate("userSave", "_id firstName lastName picturePath location")
+      .populate({
+        path: "postId",
+        populate: [
+          {
+            path: "userPost",
+            select: "_id firstName lastName picturePath location",
+          },
+          {
+            path: "comments.userComment",
+            select: "_id firstName lastName picturePath location",
+          },
+        ],
+      });
+    const posts = savedPosts.map((save) => save.postId);
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+export const getUserMemory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const memoryPosts = await Post.find({
+      userPost: userId,
+      isAnniversaryPost: true,
+    })
+      .populate("userPost", "_id firstName lastName picturePath location")
+      .populate({
+        path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      });
+    res.status(200).json(memoryPosts);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -321,26 +371,6 @@ export const replyCommentPost = async (req, res) => {
     const updatedPost = await post.save();
 
     res.status(200).json(updatedPost);
-    // const updatedPost = await Post.findByIdAndUpdate(
-    //   id,
-    //   {
-    //     comments: [
-    //       ...post.comments,
-    //       {
-    //         replies: [
-    //           {
-    //             replyCommentId: new mongoose.Types.ObjectId(),
-    //             UserComment,
-    //             replyCommentText,
-    //             updatedAt: new Date(),
-    //             createdAt: new Date(),
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    //   { new: true }
-    // );
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -397,7 +427,7 @@ export const deleteReplyComment = async (req, res) => {
 export const restorePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await Post.restore({ _id: id })
+    const post = await Post.restore({ _id: id, isAnniversaryPost: false })
       .populate({
         path: "comments.userComment",
         select: "_id firstName lastName picturePath location",
@@ -417,7 +447,7 @@ export const softDelete = async (req, res) => {
   try {
     const { id } = req.params;
     await Post.delete({ _id: id });
-    const remainPost = await Post.find()
+    const remainPost = await Post.find({ isAnniversaryPost: false })
       .populate({
         path: "comments.userComment",
         select: "_id firstName lastName picturePath location",
@@ -448,5 +478,93 @@ export const destroyPost = async (req, res) => {
     res.status(200).json(remainPost);
   } catch (err) {
     res.status(404).json({ message: err.message });
+  }
+};
+
+export const savePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+    // Kiểm tra xem bài viết đã được lưu chưa
+    const existingSave = await SavePost.findOne({
+      userSave: userId,
+      postId: id,
+    });
+    if (existingSave) {
+      return res.status(400).json({ error: "Post already saved" });
+    }
+
+    // Lưu bài viết
+    const newSave = new SavePost({ userSave: userId, postId: id });
+    await newSave.save();
+
+    res.status(200).json(newSave);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+export const unsavePost = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const { postId } = req.params;
+
+    await SavePost.findOneAndDelete({ userSave: userId, postId });
+
+    res.status(200).json({ message: "Post unsaved successfully" });
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+export const createAnniversaryPosts = async () => {
+  const currentDate = new Date();
+  for (let i = 1; i <= 5; i++) {
+    const anniversaryDate = new Date();
+    anniversaryDate.setFullYear(currentDate.getFullYear() - i);
+
+    const startOfDayAnniversary = new Date(anniversaryDate);
+    startOfDayAnniversary.setHours(0, 0, 0, 0);
+
+    const endOfDayAnniversary = new Date(anniversaryDate);
+    endOfDayAnniversary.setHours(23, 59, 59, 999);
+
+    const posts = await Post.find({
+      createdAt: {
+        $gte: startOfDayAnniversary,
+        $lte: endOfDayAnniversary,
+      },
+      deleted: false,
+      alreadyAniversary: false,
+    });
+
+    for (const post of posts) {
+      const years = currentDate.getFullYear() - post.createdAt.getFullYear();
+
+      const newPost = new Post({
+        userPost: post.userPost,
+        description: post.description,
+        file: post.file,
+        likes: [],
+        comments: [],
+        isAnniversaryPost: true,
+        anniversariesCelebrated: years,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      try {
+        post.alreadyAniversary = true;
+        await post.save();
+        await newPost.save();
+        console.log(
+          `Created anniversary post for original post ID: ${post._id}`
+        );
+      } catch (error) {
+        console.error(
+          `Error creating anniversary post for post ID: ${post._id}`,
+          error
+        );
+      }
+    }
   }
 };

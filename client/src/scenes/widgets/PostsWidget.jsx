@@ -9,7 +9,10 @@ const PostsWidget = ({
   userId,
   isProfile = false,
   trashPosts = false,
+  storagePage = false,
   detailPost = false,
+  memoryPage = false,
+  isAnniversaryPost = false,
   postId,
 }) => {
   const dispatch = useDispatch();
@@ -65,6 +68,38 @@ const PostsWidget = ({
     }
   };
 
+  const getUserStorage = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/posts/${userId}/storage`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const getUserMemory = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/posts/${userId}/memory`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const getDetailPost = async () => {
     try {
       const response = await fetch(`${apiUrl}/posts/detail/${postId}`, {
@@ -88,6 +123,10 @@ const PostsWidget = ({
       getUserTrash();
     } else if (detailPost) {
       getDetailPost();
+    } else if (storagePage) {
+      getUserStorage();
+    } else if (memoryPage) {
+      getUserMemory();
     } else {
       getPosts();
     }
@@ -124,6 +163,7 @@ const PostsWidget = ({
             file,
             likes,
             comments,
+            anniversariesCelebrated,
           }) => (
             // <PostWidget
             //   key={_id}
@@ -151,7 +191,10 @@ const PostsWidget = ({
               likes={likes}
               comments={comments}
               trashPosts={trashPosts}
+              storagePage={storagePage}
               detailPost={detailPost}
+              isAnniversaryPost={isAnniversaryPost}
+              anniversariesCelebrated={anniversariesCelebrated}
             />
           )
         )

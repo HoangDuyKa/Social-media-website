@@ -61,14 +61,14 @@ export const initializeSocket = (userId, dispatch) => {
   });
   socket.on("receiverNofi", (noti) => {
     // toast.success(noti.message);
-    // <NotificationPopup notification={noti} />;
     if (!document.hasFocus() || document.hasFocus()) {
       const sound = new Audio(notification);
       sound.play();
-      // console.log(newMessage);
-      // toast.success(newMessage.message);
     }
-    toast(<NotificationPopup notification={noti} />);
+    toast(<NotificationPopup notification={noti} />, {
+      position: "bottom-left",
+      closeButton: "true",
+    });
 
     // const popup = ReactDOM.createRoot(
     //   document.getElementById("notification-root")

@@ -57,6 +57,14 @@ function App() {
               element={isAuth ? <TrashPost /> : <Navigate to="/login" />}
             />
             <Route
+              path="/storage/:userId"
+              element={isAuth ? <StoragePage /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/memory/:userId"
+              element={isAuth ? <MemoryPage /> : <Navigate to="/login" />}
+            />
+            <Route
               path="/detail/post/:postId"
               element={isAuth ? <DetailPost /> : <Navigate to="/login" />}
             />
@@ -69,8 +77,7 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
-      <Toaster position="top-right" richColors closeButton />
-      {/* <Toaster position="bottom-left" richColors closeButton /> */}
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
@@ -81,6 +88,8 @@ const ProfilePage = Loadable(lazy(() => import("scenes/profilePage")));
 const Messenger = Loadable(lazy(() => import("scenes/messengerPage")));
 const Page404 = Loadable(lazy(() => import("scenes/404Page")));
 const TrashPost = Loadable(lazy(() => import("scenes/trashPostPage")));
+const StoragePage = Loadable(lazy(() => import("scenes/storagePage")));
+const MemoryPage = Loadable(lazy(() => import("scenes/memoryPage")));
 const DetailPost = Loadable(lazy(() => import("scenes/detailPost")));
 const SearchPage = Loadable(lazy(() => import("scenes/searchPage")));
 

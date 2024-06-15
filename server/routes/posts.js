@@ -15,6 +15,10 @@ import {
   editReplyComment,
   createPost,
   getDetailPost,
+  getUserStorage,
+  getUserMemory,
+  savePost,
+  unsavePost,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 import { upload } from "../utils/upload.js";
@@ -33,6 +37,7 @@ router.post(
   upload.single("file"),
   createPost
 );
+router.post("/:id/save", verifyToken, savePost);
 
 /* UPDATE */
 router.patch("/:id/like", verifyToken, likePost);
@@ -47,11 +52,14 @@ router.patch("/:id/restore", verifyToken, restorePost);
 /* DELETE */
 router.delete("/:id", verifyToken, softDelete);
 router.delete("/:id/force", verifyToken, destroyPost);
+router.delete("/:postId/unsave", verifyToken, unsavePost);
 
 /* READ */
 router.get("/:userId/posts", verifyToken, getUserPosts);
 router.get("/detail/:postId", verifyToken, getDetailPost);
 router.get("/:userId/trash", verifyToken, getUserTrash);
+router.get("/:userId/storage", verifyToken, getUserStorage);
+router.get("/:userId/memory", verifyToken, getUserMemory);
 router.get("/", verifyToken, getFeedPosts);
 
 export default router;

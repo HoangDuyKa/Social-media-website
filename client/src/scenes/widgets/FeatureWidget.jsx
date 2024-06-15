@@ -7,19 +7,20 @@ import {
   Delete,
   Message,
   Home,
+  WorkHistory,
+  Storage,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme, IconButton } from "@mui/material";
 import UserImage from "components/UserImage";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FriendListWidget from "./FriendListWidget";
 import Friends from "scenes/Dialog/FriendsDialog";
 import { toast } from "sonner";
-
-const UserWidget = ({ userId }) => {
+const FeatureWidget = ({ userId }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleCloseDialog = () => {
@@ -142,6 +143,41 @@ const UserWidget = ({ userId }) => {
               Messenger
             </Typography>
           </Box>
+
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <IconButton
+              onClick={() => {
+                navigate(`/storage/${userId}`);
+              }}
+              sx={{
+                p: 0,
+                width: "max-content",
+              }}
+            >
+              <Storage fontSize="large" sx={{ color: dark }} />
+            </IconButton>
+
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Storages
+            </Typography>
+          </Box>
+          <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
+            <IconButton
+              onClick={() => {
+                navigate(`/memory/${userId}`);
+              }}
+              sx={{
+                p: 0,
+                width: "max-content",
+              }}
+            >
+              <WorkHistory fontSize="large" sx={{ color: dark }} />
+            </IconButton>
+
+            <Typography sx={{ fontSize: "1rem" }} color={medium}>
+              Memories
+            </Typography>
+          </Box>
           <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
             <IconButton
               onClick={() => {
@@ -174,4 +210,4 @@ const UserWidget = ({ userId }) => {
   );
 };
 
-export default UserWidget;
+export default FeatureWidget;

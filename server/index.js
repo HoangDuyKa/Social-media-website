@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import cron from "node-cron";
 // import path from "path";
 // import { fileURLToPath } from "url";
 
@@ -10,6 +11,7 @@ import Router from "./routes/index.js";
 
 import { app, server } from "./socket/socket.js";
 import connectToMongoDB from "./configs/db.js";
+import { createAnniversaryPosts } from "./controllers/posts.js";
 // import { sendMessage } from "./controllers/message.js";
 // import { updateUser } from "./controllers/users.js";
 // import { upload } from "./utils/upload.js";
@@ -64,6 +66,17 @@ app.use("/", Router);
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 5000;
 
+// Schedule the task to run every day at midnight
+cron.schedule("0 0 * * *", async () => {
+  console.log("Running the anniversary check...");
+  await createAnniversaryPosts();
+});
+
+//check auto after a minute
+// cron.schedule("* * * * *", async () => {
+//   console.log("Running the anniversary check...");
+//   await createAnniversaryPosts();
+// });
 server.listen(PORT, () => {
   console.log(`Server Running on port ${PORT}`);
   connectToMongoDB();

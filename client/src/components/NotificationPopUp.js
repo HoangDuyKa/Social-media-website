@@ -74,22 +74,14 @@
 
 // export default NotificationPopup;
 
-import React, { useEffect, useState } from "react";
-import {
-  Snackbar,
-  Avatar,
-  Typography,
-  IconButton,
-  Box,
-  Paper,
-  useTheme,
-} from "@mui/material";
+import React, { useState } from "react";
+
+import { Avatar, Typography, IconButton, Box, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 const NotificationPopup = ({ notification }) => {
   const [open, setOpen] = useState(true);
   const palette = useTheme();
-
   const handleClose = () => {
     setOpen(false);
   };
