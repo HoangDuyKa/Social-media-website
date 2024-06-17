@@ -33,6 +33,16 @@ const UserSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    otp: {
+      type: String,
+    },
+    otp_expiry_time: {
+      type: Date,
+    },
     location: String,
     occupation: String,
     viewedProfile: Number,

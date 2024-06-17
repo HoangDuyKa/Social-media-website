@@ -103,7 +103,7 @@ export const getUserStorage = async (req, res) => {
     const { userId } = req.params;
     const savedPosts = await SavePost.find({
       userSave: userId,
-      isAnniversaryPost: false,
+      // isAnniversaryPost: false,
     })
       .populate("userSave", "_id firstName lastName picturePath location")
       .populate({

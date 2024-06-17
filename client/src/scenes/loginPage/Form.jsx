@@ -51,6 +51,16 @@ const loginSchema = yup.object().shape({
   password: yup.string().required("required"),
 });
 
+const verifySchema = yup.object().shape({
+  // code1: yup.string().required("Code is required"),
+  // code2: yup.string().required("Code is required"),
+  // code3: yup.string().required("Code is required"),
+  // code4: yup.string().required("Code is required"),
+  // code5: yup.string().required("Code is required"),
+  // code6: yup.string().required("Code is required"),
+  otp: yup.string().required("Code is required"),
+});
+
 const initialValuesRegister = {
   firstName: "",
   lastName: "",
@@ -66,6 +76,15 @@ const initialValuesLogin = {
   password: "",
 };
 
+const initialValuesVerify = {
+  // code1: "",
+  // code2: "",
+  // code3: "",
+  // code4: "",
+  // code5: "",
+  // code6: "",
+  otp: "",
+};
 const Form = () => {
   const [pageType, setPageType] = useState("login");
   const { palette } = useTheme();
@@ -74,6 +93,8 @@ const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const isVerify = pageType === "verify";
+  const [email, setEmail] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const register = async (values, onSubmitProps) => {
@@ -97,9 +118,12 @@ const Form = () => {
       onSubmitProps.resetForm();
 
       if (savedUser) {
-        toast.success("Register Successful");
-
-        setPageType("login");
+        // toast.success("Register Successful");
+        // setPageType("login");
+        setEmail(values["email"]);
+        toast.info("Go to your mail to get the OTP and provide below");
+        setPageType("verify");
+        // navigate(`/verify/${savedUser._id}`);
       }
     } catch (error) {
       toast.error(error.message);
@@ -135,16 +159,50 @@ const Form = () => {
     }
   };
 
+  const verify = async (values, onSubmitProps) => {
+    try {
+      const savedUserResponse = await fetch(`${apiUrl}/auth/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          otp: values["otp"],
+          email,
+        }),
+      });
+      const savedUser = await savedUserResponse.json();
+      if (savedUser.error) {
+        throw new Error(savedUser.error);
+      }
+      onSubmitProps.resetForm();
+
+      if (savedUser) {
+        toast.success("Register Successful");
+        setPageType("login");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const handleFormSubmit = async (values, onSubmitProps) => {
     if (isLogin) await login(values, onSubmitProps);
     if (isRegister) await register(values, onSubmitProps);
+    if (isVerify) await verify(values, onSubmitProps);
   };
 
   return (
     <Formik
       onSubmit={handleFormSubmit}
-      initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
-      validationSchema={isLogin ? loginSchema : registerSchema}
+      initialValues={
+        isLogin
+          ? initialValuesLogin
+          : isVerify
+          ? initialValuesVerify
+          : initialValuesRegister
+      }
+      validationSchema={
+        isLogin ? loginSchema : isVerify ? verifySchema : registerSchema
+      }
     >
       {({
         values,
@@ -248,27 +306,104 @@ const Form = () => {
               </>
             )}
 
-            <TextField
-              label="Email"
-              onBlur={handleBlur}
-              onChange={handleChange}
-              value={values.email}
-              name="email"
-              error={Boolean(touched.email) && Boolean(errors.email)}
-              helperText={touched.email && errors.email}
-              sx={{ gridColumn: "span 4" }}
-            />
-            <TextField
-              label="Password"
-              type="password"
-              onBlur={handleBlur}
-              onChange={handleChange}
-              value={values.password}
-              name="password"
-              error={Boolean(touched.password) && Boolean(errors.password)}
-              helperText={touched.password && errors.password}
-              sx={{ gridColumn: "span 4" }}
-            />
+            {isLogin || isRegister ? (
+              <>
+                <TextField
+                  label="Email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  name="email"
+                  error={Boolean(touched.email) && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <TextField
+                  label="Password"
+                  type="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                  name="password"
+                  error={Boolean(touched.password) && Boolean(errors.password)}
+                  helperText={touched.password && errors.password}
+                  sx={{ gridColumn: "span 4" }}
+                />
+              </>
+            ) : (
+              <>
+                <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.otp}
+                  name="otp"
+                  error={Boolean(touched.otp) && Boolean(errors.otp)}
+                  helperText={touched.otp && errors.otp}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                {/* <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.code1}
+                  name="code1"
+                  error={Boolean(touched.code1) && Boolean(errors.code1)}
+                  helperText={touched.code1 && errors.code1}
+                  sx={{ gridColumn: "span 1" }}
+                />
+                <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.code2}
+                  name="code2"
+                  error={Boolean(touched.code2) && Boolean(errors.code2)}
+                  helperText={touched.code2 && errors.code2}
+                  sx={{ gridColumn: "span 1" }}
+                />
+                <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.code3}
+                  name="code3"
+                  error={Boolean(touched.code3) && Boolean(errors.code3)}
+                  helperText={touched.code3 && errors.code3}
+                  sx={{ gridColumn: "span 1" }}
+                />
+                <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.code4}
+                  name="code4"
+                  error={Boolean(touched.code4) && Boolean(errors.code4)}
+                  helperText={touched.code4 && errors.code4}
+                  sx={{ gridColumn: "span 1" }}
+                />
+                <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.code5}
+                  name="code5"
+                  error={Boolean(touched.code5) && Boolean(errors.code5)}
+                  helperText={touched.code5 && errors.code5}
+                  sx={{ gridColumn: "span 1" }}
+                />
+                <TextField
+                  type="text"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.code6}
+                  name="code6"
+                  error={Boolean(touched.code6) && Boolean(errors.code6)}
+                  helperText={touched.code6 && errors.code6}
+                  sx={{ gridColumn: "span 1" }}
+                /> */}
+              </>
+            )}
           </Box>
 
           {/* BUTTONS */}
@@ -284,7 +419,7 @@ const Form = () => {
                 "&:hover": { color: palette.primary.main },
               }}
             >
-              {isLogin ? "LOGIN" : "REGISTER"}
+              {isLogin ? "LOGIN" : isVerify ? "VERIFY" : "REGISTER"}
             </Button>
             <Typography
               onClick={() => {
