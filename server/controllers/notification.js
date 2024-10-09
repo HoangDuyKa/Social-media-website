@@ -59,7 +59,7 @@ export const createNotifications = async (
       {
         placeId: id, //the place where the notification looking for is located
         userSender,
-        userId:receiverNotification,
+        userId: receiverNotification,
         // senderImage,
         type,
         message,
@@ -68,7 +68,7 @@ export const createNotifications = async (
         createdAt: new Date(), // Set the current date and time
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
-    ).populate("userSender","_id firstName lastName picturePath location");
+    ).populate("userSender", "_id firstName lastName picturePath location");
 
     // Emit the notification to the receiver if they are connected
     const receiverSocketId = getReceiverSocketId(receiverNotification);
@@ -86,10 +86,12 @@ export const createNotifications = async (
 export const getNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
-    const notifications = await Notification.find({ userId }).populate("userSender","_id firstName lastName picturePath location").sort({
-      createdAt: -1,
-    });
-    console.log(notifications)
+    const notifications = await Notification.find({ userId })
+      .populate("userSender", "_id firstName lastName picturePath location")
+      .sort({
+        createdAt: -1,
+      });
+    // console.log(notifications)
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -105,7 +107,7 @@ export const updateNotificationStatus = async (req, res) => {
       id,
       { isRead },
       { new: true }
-    ).populate("userSender","_id firstName lastName picturePath location");
+    ).populate("userSender", "_id firstName lastName picturePath location");
 
     if (!notification) {
       return res.status(404).json({ message: "Notification not found" });

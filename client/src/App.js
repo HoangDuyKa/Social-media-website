@@ -72,6 +72,26 @@ function App() {
               path="/results"
               element={isAuth ? <SearchPage /> : <Navigate to="/login" />}
             />
+            <Route
+              path="/dashboard"
+              element={
+                isAuth && isAuth.role == "admin" ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/404" />
+                )
+              }
+            />
+            {/* <Route
+              path="/searchWithAI"
+              element={
+                isAuth ? (
+                  <SearchPageWithAIGenerateImage />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            /> */}
             <Route path="/404" element={<Page404 />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
@@ -92,5 +112,9 @@ const StoragePage = Loadable(lazy(() => import("scenes/storagePage")));
 const MemoryPage = Loadable(lazy(() => import("scenes/memoryPage")));
 const DetailPost = Loadable(lazy(() => import("scenes/detailPost")));
 const SearchPage = Loadable(lazy(() => import("scenes/searchPage")));
+const AdminDashboard = Loadable(lazy(() => import("scenes/adminDashboard")));
+const SearchPageWithAIGenerateImage = Loadable(
+  lazy(() => import("scenes/SearchPageWithAIGenerateImage"))
+);
 
 export default App;

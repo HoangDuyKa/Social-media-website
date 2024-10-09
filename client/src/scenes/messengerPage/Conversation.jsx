@@ -1,5 +1,5 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import ChatHeader from "./MsgComponents/ChatHeader";
 import ChatFooter from "./MsgComponents/ChatFooter";
@@ -7,6 +7,7 @@ import Message from "./MsgComponents/Message";
 import { useSelector } from "react-redux";
 import NoChat from "assets/Illustration/NoChat";
 import { Link } from "react-router-dom";
+import { getSocket } from "socket";
 
 const Conversation = () => {
   const { current_conversation, current_messages } = useSelector(
@@ -14,6 +15,13 @@ const Conversation = () => {
   );
   const theme = useTheme();
   const messageListRef = useRef();
+  // const socket = getSocket();
+
+  // const [newUser, setNewUser] = useState({});
+  // socket.on("start_chat", async (data) => {
+  //   // console.log(data);
+  //   setNewUser(data);
+  // });
 
   useEffect(() => {
     if (messageListRef.current) {

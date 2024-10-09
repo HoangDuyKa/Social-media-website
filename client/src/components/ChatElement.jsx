@@ -122,6 +122,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import StyledBadge from "./StyledBadge";
 import { SetCurrentConversation } from "Redux/Slice/conversation";
+import { getSocket } from "socket";
+import { useState } from "react";
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   "&:hover": {
@@ -144,6 +146,7 @@ export const ChatElement = ({
   ...other
 }) => {
   const theme = useTheme();
+
   // const name = `${firstName} ${lastName}`;
   const onlineUsers = useSelector((state) => state.app.onlineUsers);
   // const { current_conversation, conversations } = useSelector(
@@ -152,15 +155,22 @@ export const ChatElement = ({
   const online = onlineUsers.includes(user_id);
 
   const dispatch = useDispatch();
-  // console.log(other);
   const conversation = { user_id, img, name, ...other };
-  // console.log(conversation);
 
   const selectedConversation = useSelector(
     (state) => state.conversation.direct_chat.current_conversation
   );
   const isSelected = selectedConversation?.user_id === user_id;
   // console.log(selectedConversation);
+
+  // const socket = getSocket();
+  // const [newUser, setNewUser] = useState({});
+
+  // socket.on("start_chat", async (data) => {
+  //   // console.log(data);
+  //   setNewUser(data);
+  // });
+  // console.log(newUser);
 
   return (
     <StyledChatBox

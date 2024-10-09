@@ -151,6 +151,12 @@ const Navbar = () => {
                 <Typography>{fullName}</Typography>
                 {/* <Typography >Profile</Typography> */}
               </MenuItem>
+
+              {user.role === "admin" && (
+                <MenuItem onClick={() => navigate(`/dashboard`)}>
+                  <Typography>Dashboard</Typography>
+                </MenuItem>
+              )}
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>
           </FormControl>
