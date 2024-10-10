@@ -34,7 +34,7 @@ import { setOnlineUsers } from "Redux/Slice/app";
 import { addNotification } from "Redux/Slice/notification";
 import NotificationPopup from "components/NotificationPopUp";
 import { io } from "socket.io-client";
-import ReactDOM from "react-dom/client";
+// import ReactDOM from "react-dom/client";
 import { toast } from "sonner";
 import notification from "assets/sounds/notification.mp3";
 

@@ -175,9 +175,11 @@ const Form = () => {
       }
       onSubmitProps.resetForm();
 
-      if (savedUser) {
-        toast.success("Register Successful");
+      if (savedUser.status === "success") {
+        toast.success(savedUser.message);
         setPageType("login");
+      } else if (savedUser.status === "error") {
+        toast.error(savedUser.message);
       }
     } catch (error) {
       toast.error(error.message);

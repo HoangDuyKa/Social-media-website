@@ -29,8 +29,8 @@ const FormEditUser = ({ user, setEditUser }) => {
     password: "",
     newPassword: "",
     confirmNewPassword: "",
-    location: user.location.trim(),
-    occupation: user.occupation.trim(),
+    location: user.location ? user.location.trim() : "",
+    occupation: user.occupation ? user.occupation.trim() : "",
     picture: user.picturePath.trim(),
   };
 
@@ -55,7 +55,6 @@ const FormEditUser = ({ user, setEditUser }) => {
         }
       );
       const savedUser = await savedUserResponse.json();
-      console.log(savedUser);
       if (savedUser.error) {
         throw new Error(savedUser.error);
       }

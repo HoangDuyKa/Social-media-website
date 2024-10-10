@@ -45,6 +45,23 @@ function App() {
               element={isAuth ? <HomePage /> : <LoginPage />}
             />
             <Route
+              path="/register"
+              element={isAuth ? <HomePage /> : <RegisterPage />}
+            />
+
+            <Route
+              path="/reset-password"
+              element={isAuth ? <HomePage /> : <ResetPassPage />}
+            />
+            <Route
+              path="/new-password"
+              element={isAuth ? <HomePage /> : <NewPasswordPage />}
+            />
+            <Route
+              path="/verify/:email"
+              element={isAuth ? <HomePage /> : <VerifyPage />}
+            />
+            <Route
               path="/profile/:userId"
               element={isAuth ? <ProfilePage /> : <Navigate to="/login" />}
             />
@@ -97,13 +114,18 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" closeButton richColors />
     </div>
   );
 }
 
 const HomePage = Loadable(lazy(() => import("scenes/homePage")));
-const LoginPage = Loadable(lazy(() => import("scenes/loginPage")));
+// const LoginPage = Loadable(lazy(() => import("scenes/loginPage")));
+const LoginPage = Loadable(lazy(() => import("scenes/auth/Login")));
+const RegisterPage = Loadable(lazy(() => import("scenes/auth/Register")));
+const ResetPassPage = Loadable(lazy(() => import("scenes/auth/ResetPassword")));
+const NewPasswordPage = Loadable(lazy(() => import("scenes/auth/NewPassword")));
+const VerifyPage = Loadable(lazy(() => import("scenes/auth/Verify")));
 const ProfilePage = Loadable(lazy(() => import("scenes/profilePage")));
 const Messenger = Loadable(lazy(() => import("scenes/messengerPage")));
 const Page404 = Loadable(lazy(() => import("scenes/404Page")));
