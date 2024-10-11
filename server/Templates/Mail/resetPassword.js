@@ -133,10 +133,9 @@ export default function (name, link) {
                                   <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                     <tr>
                                       <td style="padding-right: 0px;padding-left: 0px;" align="center">
-    
-                                        <img align="center" border="0" src="https://assets.unlayer.com/projects/47137/1675000768671-logo.ico" alt="Sateeq Logo" title="Sateeq Logo" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 19%;max-width: 106.4px;"
-                                          width="106.4" />
-    
+                                      <a href="${process.env.CLIENT_URL}" target="_blank">
+                                      <img src="https://res.cloudinary.com/dv2rpmss3/image/upload/v1728572247/avtzxoalt4zfcpzwxcz4.png" alt="ConnectU" style="display: block; width: 100px; height: auto;" />
+                                          </a>
                                       </td>
                                     </tr>
                                   </table>
@@ -180,7 +179,7 @@ export default function (name, link) {
                                     <p style="font-size: 14px; line-height: 140%;"><span style="color: #000000; line-height: 19.6px;">Hello ${name},</span></p>
                                     <p style="font-size: 14px; line-height: 140%;"> </p>
                                     <p style="font-size: 14px; line-height: 140%;"><span style="color: #000000; line-height: 19.6px;">Please click on the given button to reset your password</span><br /><br /><span style="color: #000000; line-height: 19.6px;">Note: This link is valid for only 10 mins.</span></p>
-                                    <p style="font-size: 14px; line-height: 140%;"><br /><br /><span style="color: #000000; line-height: 19.6px;">Thanks &amp; Regards</span><br /><span style="color: #000000; line-height: 19.6px;">Team Task</span></p>
+                                    <p style="font-size: 14px; line-height: 140%;"><br /><br /><span style="color: #000000; line-height: 19.6px;">Thanks &amp; Regards</span><br /></p>
                                   </div>
     
                                 </td>
@@ -263,7 +262,7 @@ export default function (name, link) {
                                 <td style="overflow-wrap:break-word;word-break:break-word;padding:48px;font-family:'Cabin',sans-serif;" align="left">
     
                                   <div style="color: #958d8d; line-height: 170%; text-align: center; word-wrap: break-word;">
-                                    <p style="font-size: 14px; line-height: 170%;">Love 💙 Team Tawk</p>
+                                    <p style="font-size: 14px; line-height: 170%;">Love 💙 ConnectU</p>
                                     <p style="font-size: 14px; line-height: 170%;">For any assistance and queries write to us at <a rel="noopener" href="mailto:support@codingmonk.in?" target="_blank">Support@codingmonk.in</a><br /><br /></p>
                                   </div>
     

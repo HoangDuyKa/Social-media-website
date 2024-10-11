@@ -135,7 +135,7 @@ export default function (name, otp) {
                                 <tr>
                                   <td style="padding-right: 0px;padding-left: 0px;" align="center">
                                     <a href="${process.env.CLIENT_URL}" target="_blank">
-                                    <img align="center" border="0" src="https://assets.unlayer.com/projects/0/1715523187823-z5323338355759_0ce3088310e8b03e96366d3bc4232c49.jpg" alt="ConnectU" title="ConnectU" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 19%;max-width: 106.4px;"
+                                    <img align="center" border="0" src="https://res.cloudinary.com/dv2rpmss3/image/upload/v1728572247/avtzxoalt4zfcpzwxcz4.png" alt="ConnectU" title="ConnectU" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 19%;max-width: 106.4px;"
                                     width="106.4" />
                                     </a>
                                   </td>

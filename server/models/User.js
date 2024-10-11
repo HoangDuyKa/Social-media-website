@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -52,9 +53,32 @@ const UserSchema = new mongoose.Schema(
     occupation: String,
     viewedProfile: Number,
     impressions: Number,
+    passwordResetToken: {
+      // unselect
+      type: String,
+    },
+    passwordResetExpires: {
+      // unselect
+      type: Date,
+    },
   },
   { timestamps: true }
 );
 
-const User = mongoose.model("User", UserSchema);
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // Hash the token and set it to passwordResetToken field
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set expiration time for the token (10 minutes from now)
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
+const User = mongoose.model("User", userSchema);
 export default User;
