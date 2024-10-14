@@ -7,6 +7,8 @@ import {
   getUsers,
   getRequests,
   updateUser,
+  destroyUser,
+  lockUser
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 import { upload } from "../utils/upload.js";
@@ -22,6 +24,7 @@ router.get("/:id", verifyToken, getUser);
 router.get("/:id/friends", verifyToken, getUserFriends);
 
 /* UPDATE */
+router.patch("/:id/lock", verifyToken, lockUser);
 router.patch("/:id/:friendId", verifyToken, addRemoveFriend);
 router.put(
   "/updateUser/:userId",
@@ -29,5 +32,8 @@ router.put(
   verifyToken,
   updateUser
 );
+
+/* DELETE */
+router.delete("/:id/force", verifyToken, destroyUser);
 
 export default router;

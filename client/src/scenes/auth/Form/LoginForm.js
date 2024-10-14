@@ -67,16 +67,20 @@ export default function AuthLoginForm() {
       }
       reset();
       if (loggedIn) {
-        dispatch(
-          setLogin({
-            user: loggedIn.user,
-            token: loggedIn.token,
-          })
-        );
-        window.localStorage.setItem("user_id", loggedIn.user._id);
-        toast.success("Login Successful");
-
-        navigate("/");
+        if(loggedIn.user.lock === true){
+          toast.warning("Your account have been locked, please contact admin to know");
+        }else{
+          dispatch(
+            setLogin({
+              user: loggedIn.user,
+              token: loggedIn.token,
+            })
+          );
+          window.localStorage.setItem("user_id", loggedIn.user._id);
+          toast.success("Login Successfully");
+  
+          navigate("/");
+        }
       }
     } catch (error) {
       toast.error(error.message);

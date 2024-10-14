@@ -1,12 +1,21 @@
-import { Link as RouterLink } from "react-router-dom";
 // sections
-import { Stack, Typography, Link, Container } from "@mui/material";
+import { Stack, Typography, Container } from "@mui/material";
 import VerifyForm from "./Form/VerifyForm";
-import Logo from "../../assets/Images/logo.ico";
+import Logo from "components/Logo";
+import { useLocation } from "react-router-dom";
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function VerifyPage() {
+
+  // const [queryParameters] = useSearchParams();
+  // console.log(queryParameters)
+
+  const location = useLocation();
+  const { email } = location.state || {}; // Access the state passed from Page 1
+  console.log(location.state)
+
+
   return (
     <>
       <Container sx={{ mt: 5 }} maxWidth="sm">
@@ -14,7 +23,7 @@ export default function LoginPage() {
           <Stack
             sx={{ width: "100%", direction: "column", alignItems: "center" }}
           >
-            <img style={{ width: 200 }} src={Logo} alt="Logo" />
+            <Logo/>
           </Stack>
         </Stack>
         <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
@@ -22,7 +31,7 @@ export default function LoginPage() {
 
           <Stack direction="row" spacing={0.5}>
             <Typography variant="body2">
-              Sent to email (shreyanshshah242@gmail.com)
+              Sent to email {email}
             </Typography>
           </Stack>
         </Stack>

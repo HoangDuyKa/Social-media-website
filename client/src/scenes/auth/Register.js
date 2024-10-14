@@ -1,10 +1,10 @@
 import React from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 // @mui
 import { Stack, Typography, Link, Container, Box } from "@mui/material";
 import AuthRegisterForm from "./Form/RegisterForm";
 import AuthSocial from "./Form/AuthSocial";
-import Logo from "../../assets/Images/logo.ico";
+import Logo from "components/Logo";
 
 // ----------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ export default function Register() {
           <Stack
             sx={{ width: "100%", direction: "column", alignItems: "center" }}
           >
-            <img style={{ width: 200 }} src={Logo} alt="Logo" />
+            <Logo/>
           </Stack>
         </Stack>
         <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>

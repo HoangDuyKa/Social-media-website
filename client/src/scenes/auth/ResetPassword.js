@@ -1,9 +1,9 @@
-import { Stack, Typography, Link, Container, Box } from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Stack, Typography, Container, Box } from "@mui/material";
+import {  useNavigate } from "react-router-dom";
 import React from "react";
 import { CaretLeft } from "phosphor-react";
 import AuthResetPasswordForm from "./Form/ResetPasswordForm";
-import Logo from "../../assets/Images/logo.ico";
+import Logo from "components/Logo";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const ResetPassword = () => {
           <Stack
             sx={{ width: "100%", direction: "column", alignItems: "center" }}
           >
-            <img style={{ width: 200 }} src={Logo} alt="Logo" />
+            <Logo/>
           </Stack>
         </Stack>
         <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>

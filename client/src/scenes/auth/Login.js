@@ -1,9 +1,9 @@
-import { Stack, Typography, Link, Container, Box } from "@mui/material";
+import { Stack, Typography, Container, Box } from "@mui/material";
 import React from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import AuthLoginForm from "./Form/LoginForm";
 import AuthSocial from "./Form/AuthSocial";
-import Logo from "../../assets/Images/logo.ico";
+import Logo from "components/Logo";
 const Login = () => {
   const navigate = useNavigate();
   return (
@@ -13,7 +13,7 @@ const Login = () => {
           <Stack
             sx={{ width: "100%", direction: "column", alignItems: "center" }}
           >
-            <img style={{ width: 200 }} src={Logo} alt="Logo" />
+            <Logo />
           </Stack>
         </Stack>
         <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>

@@ -186,3 +186,45 @@ export const getRequests = async (req, res, next) => {
 //     message: "Friends found successfully!",
 //   });
 // };
+
+export const lockUser = async (req, res) => {
+  try {
+    const { id } = req.params; // id of post
+    const user = await User.findById(id);
+    const isLocked = user.lock === true
+    if (isLocked) {
+      user.lock = false
+    } else {
+      user.lock = true
+    }
+    await user.save();
+
+    const loggedInUserId = req.user._id.toString();
+    const remainUser = await User.find({
+      _id: { $ne: loggedInUserId },
+    }).select("-password");
+  
+    res.status(200).json({
+      status: "success",
+      data: remainUser,
+      message: isLocked? "Unlock User Successfully": "Lock User Successfully",
+    });
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+
+export const destroyUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await User.deleteOne({ _id: id });
+    const loggedInUserId = req.user._id.toString();
+    const remainUser = await User.find({
+      _id: { $ne: loggedInUserId },
+    }).select("-password");
+    res.status(200).json(remainUser);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};

@@ -4,22 +4,26 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 // @mui
-import { Link, Stack, Alert, IconButton, InputAdornment } from "@mui/material";
+import {  Stack, Alert, IconButton, InputAdornment } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
 import FormProvider, { RHFTextField } from "../../../components/hook-form";
 import { Eye, EyeSlash } from "phosphor-react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 // ----------------------------------------------------------------------
 
 export default function AuthRegisterForm() {
-  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
+
+  // const handleNavigate = ({email}) => {
+  //   console.log(email)
+  //   navigate(`/verify/${email}`, { state: { email: email} });
+  // };
+
   const LoginSchema = Yup.object().shape({
     firstName: Yup.string().required("First name required"),
     lastName: Yup.string().required("Last name required"),
@@ -57,7 +61,6 @@ export default function AuthRegisterForm() {
         formData.append(value, values[value]);
       }
       // formData.append("picturePath", values.picture.name);
-
       const savedUserResponse = await fetch(`${apiUrl}/auth/register`, {
         method: "POST",
         body: formData,
@@ -69,7 +72,8 @@ export default function AuthRegisterForm() {
       reset();
       if (savedUser) {
         toast.info("Go to your mail to get the OTP and provide below");
-        navigate(`/verify/${values["email"]}`);
+        // navigate(`/verify/${values["email"]}`);
+        navigate(`/verify/${values["email"]}`, { state: { email: `${values["email"]}`} });
       }
     } catch (error) {
       toast.error(error.message);

@@ -31,6 +31,7 @@ import notificationSound from "assets/sounds/notification.mp3";
 import { getSocket } from "socket";
 import NotificationDropdown from "components/NotificationDropdown";
 import { toast } from "sonner";
+import Logo from "components/Logo";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -44,7 +45,6 @@ const Navbar = () => {
   const neutralLight = theme.palette.neutral.light;
   const dark = theme.palette.neutral.dark;
   const background = theme.palette.background.default;
-  const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
   const fullName = `${user.firstName} ${user.lastName}`;
 
@@ -73,7 +73,7 @@ const Navbar = () => {
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
       <FlexBetween gap="1.75rem">
-        <Typography
+        {/* <Typography
           fontWeight="bold"
           fontSize="clamp(1rem, 2rem, 2.25rem)"
           color="primary"
@@ -86,7 +86,8 @@ const Navbar = () => {
           }}
         >
           ConnectU
-        </Typography>
+        </Typography> */}
+        <Logo/>
         {isNonMobileScreens && (
           <FlexBetween
             backgroundColor={neutralLight}

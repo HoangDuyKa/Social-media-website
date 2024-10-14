@@ -73,7 +73,7 @@ const PostManagement = () => {
       const formattedPosts = data.map((post) => ({
         id: post._id,
         title: post.description,
-        author: post.userPost.firstName + " " + post.userPost.lastName, // Adjust as needed to show the author's name
+        author: post.userPost?.firstName + " " + post.userPost?.lastName, // Adjust as needed to show the author's name
       }));
 
       setPosts(formattedPosts);
