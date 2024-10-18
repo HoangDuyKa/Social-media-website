@@ -3,6 +3,7 @@ import Sidebar from "./componentsDashboard/Sidebar";
 import PostManagement from "./componentsDashboard/PostManagement";
 import UserManagement from "./componentsDashboard/UserManagement";
 import Dashboard from "./componentsDashboard/Dashboard";
+import AdvertManagement from "./componentsDashboard/AdvertManagement";
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState("dashboard");
@@ -15,6 +16,8 @@ const AdminDashboard = () => {
         return <PostManagement />;
       case "users":
         return <UserManagement />;
+      case "adverts":
+        return <AdvertManagement />;
       default:
         return <Dashboard />;
     }

@@ -9,6 +9,7 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PostIcon from "@mui/icons-material/Article";
 import UserIcon from "@mui/icons-material/People";
+import ThreeDRotation from '@mui/icons-material/ThreeDRotation';
 import { Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 const Sidebar = ({ setActivePage, activePage }) => {
@@ -79,6 +80,22 @@ const Sidebar = ({ setActivePage, activePage }) => {
               <UserIcon />
             </ListItemIcon>
             <ListItemText primary="Users Management" />
+          </ListItem>
+
+          <ListItem
+            sx={{
+              backgroundColor: activePage === "adverts" ? "#e6e3e3" : "#fff",
+              "&:hover": {
+                backgroundColor: "#e6e3e3",
+              },
+            }}
+            button
+            onClick={() => setActivePage("adverts")}
+          >
+            <ListItemIcon>
+              <ThreeDRotation />
+            </ListItemIcon>
+            <ListItemText primary="Adverts Management" />
           </ListItem>
         </List>
       </Drawer>

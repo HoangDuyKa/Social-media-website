@@ -91,7 +91,8 @@ const storage = new CloudinaryStorage({
 
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 100000000 }, // Limit file size to 100MB (adjust as needed)
+  limits: { fileSize: 100 * 1024 * 1024 }, // Giới hạn kích thước tệp 100MB
+  // limits: { fileSize: 100000000 }, // Limit file size to 100MB (adjust as needed)
 });
 
 /* FILE STORAGE */

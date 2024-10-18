@@ -7,6 +7,7 @@ import postRoutes from "./posts.js";
 import messageRoutes from "./message.js";
 import notificationRoutes from "./notification.js";
 import searchRoutes from "./search.js";
+import adsRoutes from "./ads.js";
 
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
@@ -14,6 +15,7 @@ router.use("/posts", postRoutes);
 router.use("/messages", messageRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/search", searchRoutes);
+router.use("/ads", adsRoutes);
 
 export default router;
 
