@@ -8,9 +8,10 @@ const commentSchema = new mongoose.Schema({
   updatedAt: Date,
   replies: [
     {
-      replyId: mongoose.Schema.Types.ObjectId,
-      userReply: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      replyText: String,
+      replyCommentId: mongoose.Schema.Types.ObjectId,
+      userReplyComment: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      replyCommentText: String,
+      replyingTo: String,
       createdAt: Date,
       updatedAt: Date,
     },

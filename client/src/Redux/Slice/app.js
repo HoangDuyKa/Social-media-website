@@ -23,9 +23,6 @@ export const appSlice = createSlice({
     setPosts: (state, action) => {
       state.posts = action.payload.posts;
     },
-    setSearchResults: (state, action) => {
-      state.searchResults = action.payload.searchResults;
-    },
     setPost: (state, action) => {
       const updatedPosts = state.posts.map((post) => {
         if (post._id === action.payload.post._id) {

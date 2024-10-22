@@ -45,11 +45,11 @@ const RepliesSection = ({
           replyCommentText,
           createdAt,
           score,
-          UserReplyComment,
+          userReplyComment,
           replyCommentId,
           replyingTo,
         } = rep;
-        const username = `${UserReplyComment.firstName} ${UserReplyComment.lastName}`;
+        const username = `${userReplyComment.firstName} ${userReplyComment.lastName}`;
         // loggedInUser._id === UserComment._id
         return username === "" ? (
           <OwnReply
@@ -83,14 +83,14 @@ const RepliesSection = ({
                           }}
                           variant="dot"
                         >
-                          <Avatar src={UserReplyComment.picturePath}></Avatar>
+                          <Avatar src={userReplyComment.picturePath}></Avatar>
                         </StyledBadge>
                       ) : (
                         <Avatar src={loggedInUserImage}></Avatar>
                       )}
                       <Username
                         userName={username}
-                        UserComment={UserReplyComment}
+                        UserComment={userReplyComment}
                         loggedInUserId={loggedInUser._id}
                       />
                       <CreatedAt createdAt={createdAt} />

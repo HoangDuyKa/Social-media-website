@@ -158,6 +158,7 @@ const PostWidget = ({
         }),
       });
       const updatedPost = await response.json();
+      console.log(updatedPost);
       if (updatedPost.error) throw new Error(updatedPost.error);
       dispatch(setPost({ post: updatedPost }));
     } catch (error) {
@@ -394,131 +395,6 @@ const PostWidget = ({
         </Box>
       )}
     </WidgetWrapper>
-    //     <WidgetWrapper m={"0 0 1rem"}>
-    //       {isAnniversaryPost && (
-    //         <Box
-    //           sx={{
-    //             backgroundColor: palette.primary.main,
-    //             color: palette.primary.contrastText,
-    //             padding: "0.5rem",
-    //             borderRadius: "0.75rem",
-    //             marginBottom: "1rem",
-    //           }}
-    //         >
-    //           <Typography variant="h5">
-    //             Celebrating the {anniversariesCelebrated} year anniversary!
-    //           </Typography>
-    //         </Box>
-    //       )}
-    //       <Friend
-    //         friendId={postUserId}
-    //         name={name}
-    //         subtitle={time}
-    //         userPicturePath={userPicturePath}
-    //         postUserId={postUserId}
-    //         postId={postId}
-    //         trashPosts={trashPosts}
-    //         storagePage={storagePage}
-    //       />
-    //       <Typography color={main} sx={{ mt: "1rem" }}>
-    //         {description}
-    //       </Typography>
-    //       {file?.fileType === "Image" && (
-    //         <img
-    //           width="100%"
-    //           height="auto"
-    //           alt="post"
-    //           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-    //           src={file.path}
-    //         />
-    //       )}
-    //       {file?.fileType === "Video" && (
-    //         <video
-    //           width="100%"
-    //           height="auto"
-    //           alt="post"
-    //           controls
-    //           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-    //         >
-    //           <source src={file.path}></source>
-    //         </video>
-    //       )}
-    //       {file?.fileType === "File" && (
-    //         <div>
-    //           <a href={file.path} target="_blank" rel="noopener noreferrer">
-    //             Open Document{" "}
-    //           </a>
-    //           {file.fileName}
-    //           <br />
-    //           {file.path.endsWith(".pdf") && (
-    //             <div>
-    //               <Typography
-    //                 sx={{
-    //                   "&:hover": {
-    //                     cursor: "pointer",
-    //                     color: palette.primary.light,
-    //                   },
-    //                   width: "122px",
-    //                 }}
-    //                 onClick={() => SetIsPreviewPDF(!isPreviewPDF)}
-    //               >
-    //                 Preview file here
-    //               </Typography>
-    //               {isPreviewPDF && (
-    //                 <iframe
-    //                   src={file.path}
-    //                   width={"100%"}
-    //                   height="800px"
-    //                   title="Document Preview"
-    //                 ></iframe>
-    //               )}
-    //             </div>
-    //           )}
-    //         </div>
-    //       )}
-    //       {file?.fileType === "Audio" && (
-    //         <audio controls>
-    //           <source src={file.path} />
-    //         </audio>
-    //       )}
-    //       <FlexBetween mt="0.25rem">
-    //         <FlexBetween gap="1rem">
-    //           <FlexBetween gap="0.3rem">
-    //             <IconButton onClick={patchLike}>
-    //               {isLiked ? (
-    //                 <FavoriteOutlined sx={{ color: palette.primary.main }} />
-    //               ) : (
-    //                 <FavoriteBorderOutlined />
-    //               )}
-    //             </IconButton>
-    //             <Typography>{likeCount}</Typography>
-    //           </FlexBetween>
-    //           <FlexBetween gap="0.3rem">
-    //             <IconButton onClick={() => setIsComments(!isComments)}>
-    //               <ChatBubbleOutlineOutlined />
-    //             </IconButton>
-    //             <Typography>{comments.length}</Typography>
-    //           </FlexBetween>
-    //         </FlexBetween>
-    //         <IconButton>
-    //           <ShareOutlined />
-    //         </IconButton>
-    //       </FlexBetween>
-    //       {isComments && (
-    //         <Box mt="0.5rem">
-    //           <Divider sx={{ marginBottom: "1rem" }} />
-    //           <CoreComment
-    //             patchComment={patchComment}
-    //             deleteComment={deleteComment}
-    //             editComment={editComment}
-    //             patchReplyComment={patchReplyComment}
-    //             postId={postId}
-    //             postUserId={postUserId}
-    //             UserCommentImage={loggedInUser.picturePath}
-    //           />
-    //         </Box>
-    //       )}
-    //     </WidgetWrapper>
   );
 };
 

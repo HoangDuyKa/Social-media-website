@@ -198,6 +198,9 @@ const FormEditUser = ({ user, setEditUser }) => {
               error={Boolean(touched.email) && Boolean(errors.email)}
               helperText={touched.email && errors.email}
               sx={{ gridColumn: "span 4" }}
+              InputProps={{
+                readOnly: true, // Makes the field read-only
+              }}
             />
             <TextField
               label="Password"

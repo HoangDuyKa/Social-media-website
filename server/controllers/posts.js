@@ -43,19 +43,133 @@ export const createPost = async (req, res) => {
 };
 
 /* READ */
+// export const getFeedPosts = async (req, res) => {
+//   try {
+//     const post = await Post.find({ isAnniversaryPost: false })
+//       .populate("userPost", "_id firstName lastName picturePath location")
+//       .populate({
+//         path: "comments.userComment",
+//         select: "_id firstName lastName picturePath location",
+//       });
+//     res.status(200).json(post);
+//   } catch (err) {
+//     res.status(404).json({ message: err.message });
+//   }
+// };
+// export const getFeedPosts = async (req, res) => {
+//   try {
+//     const userId = req.user.id; // Assuming userId is in req.user from authentication middleware
+//     const { page, limit } = req.query; // Default to page 1 and 5 posts per page
+
+//     // Convert page and limit to numbers for calculation
+//     const pageNumber = parseInt(page, 10);
+//     const limitNumber = parseInt(limit, 10);
+//     console.log(limitNumber);
+
+//     // Find the user and get their friends
+//     const user = await User.findById(userId).select("friends");
+
+//     // Combine userId and friends' ids to create an array of all users to fetch posts from
+//     const idsToFetch = [
+//       new mongoose.Types.ObjectId(userId),
+//       ...user.friends.map((friendId) => new mongoose.Types.ObjectId(friendId)),
+//     ];
+
+//     // const userAndFriendsPosts = await Post.find({
+//     //   userPost: { $in: idsToFetch },
+//     // })
+//     //   .populate("userPost", "_id firstName lastName picturePath location")
+//     //   .populate({
+//     //     path: "comments.userComment",
+//     //     select: "_id firstName lastName picturePath location",
+//     //   })
+//     //   .populate({
+//     //     path: "comments.replies.userReplyComment",
+//     //     select: "_id firstName lastName picturePath location",
+//     //   })
+//     //   .sort({ createdAt: -1 }) // Sort by latest creation time
+//     //   .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
+//     //   .limit(limitNumber); // Limit the number of posts returned
+
+//     // // Fetch the remaining posts that are not from the user or their friends
+//     // const otherPosts = await Post.find({ userPost: { $nin: idsToFetch } })
+//     //   .populate("userPost", "_id firstName lastName picturePath location")
+//     //   .populate({
+//     //     path: "comments.userComment",
+//     //     select: "_id firstName lastName picturePath location",
+//     //   })
+//     //   .populate({
+//     //     path: "comments.replies.userReplyComment",
+//     //     select: "_id firstName lastName picturePath location",
+//     //   })
+//     //   .sort({ createdAt: -1 }) // Sort by latest creation time
+//     //   .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
+//     //   .limit(limitNumber); // Limit the number of posts returned
+//     // // Combine both arrays: user and friends' posts first, followed by the remaining posts
+//     // const allPosts = [...userAndFriendsPosts, ...otherPosts];
+
+//     const allPosts = await Post.find({
+//       // userPost: { $in: idsToFetch },
+//     })
+//       .populate("userPost", "_id firstName lastName picturePath location")
+//       .populate({
+//         path: "comments.userComment",
+//         select: "_id firstName lastName picturePath location",
+//       })
+//       .populate({
+//         path: "comments.replies.userReplyComment",
+//         select: "_id firstName lastName picturePath location",
+//       })
+//       .sort({ createdAt: -1 })
+//       .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
+//       .limit(limitNumber); // Limit the number of posts returned
+
+//     res.status(200).json(allPosts);
+//   } catch (err) {
+//     res.status(404).json({ message: err.message });
+//   }
+// };
+
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find({ isAnniversaryPost: false })
+    const userId = req.user.id; // Assuming userId is in req.user from authentication middleware
+    const { page = 1, limit = 5 } = req.query; // Default to page 1 and 5 posts per page
+    console.log(limit);
+
+    // Convert page and limit to numbers for calculation
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    // Find the user and get their friends
+    const user = await User.findById(userId).select("friends");
+
+    // Combine userId and friends' ids to create an array of all users to fetch posts from
+    const idsToFetch = [
+      new mongoose.Types.ObjectId(userId),
+      ...user.friends.map((friendId) => new mongoose.Types.ObjectId(friendId)),
+    ];
+    // Combine query to fetch posts, prioritizing user's and friends' posts
+    const allPosts = await Post.find({
+      $or: [
+        { userPost: { $in: idsToFetch } }, // Posts from the user and their friends
+        { userPost: { $nin: idsToFetch } }, // Posts from other users
+      ],
+      isAnniversaryPost: false,
+    })
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
         select: "_id firstName lastName picturePath location",
-      });
-    // const post = await Post.aggregate([
-    //   // { $match: { userId: mongoose.Types.ObjectId(userId) } },
-    //   { $sample: { size: 10 } }, // Bạn có thể thay đổi size tùy thuộc vào số lượng bài viết bạn muốn lấy
-    // ]);
-    res.status(200).json(post);
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .sort({ createdAt: -1 }) // Sort by latest creation time
+      .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
+      .limit(limitNumber); // Limit the number of posts returned
+
+    res.status(200).json(allPosts);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -68,6 +182,10 @@ export const getUserPosts = async (req, res) => {
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
         select: "_id firstName lastName picturePath location",
       })
       .sort({ createdAt: -1 });
@@ -86,6 +204,10 @@ export const getUserTrash = async (req, res) => {
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
         select: "_id firstName lastName picturePath location",
       });
 
@@ -117,8 +239,16 @@ export const getUserStorage = async (req, res) => {
             path: "comments.userComment",
             select: "_id firstName lastName picturePath location",
           },
+          {
+            path: "comments.replies.userReplyComment",
+            select: "_id firstName lastName picturePath location",
+          },
         ],
       });
+    // .populate({
+    //   path: "comments.replies.userReplyComment",
+    //   select: "_id firstName lastName picturePath location",
+    // });
     const posts = savedPosts.map((save) => save.postId);
 
     res.status(200).json(posts);
@@ -138,6 +268,10 @@ export const getUserMemory = async (req, res) => {
       .populate({
         path: "comments.userComment",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
     res.status(200).json(memoryPosts);
   } catch (err) {
@@ -152,6 +286,10 @@ export const getDetailPost = async (req, res) => {
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
         select: "_id firstName lastName picturePath location",
       });
 
@@ -196,6 +334,10 @@ export const likePost = async (req, res) => {
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
         select: "_id firstName lastName picturePath location",
       });
 
@@ -250,6 +392,10 @@ export const commentPost = async (req, res) => {
       .populate({
         path: "userPost",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
     // Populate userPost field
     console.log("updatedPost", updatedPost);
@@ -291,6 +437,10 @@ export const editComment = async (req, res) => {
       .populate({
         path: "userPost",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
@@ -325,6 +475,10 @@ export const deleteComment = async (req, res) => {
       .populate({
         path: "userPost",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
 
     const filteredComments = post.comments.filter(
@@ -347,7 +501,36 @@ export const replyCommentPost = async (req, res) => {
     const { userReplyComment, replyCommentId, replyCommentText, replyingTo } =
       req.body;
     // console.log(req.body);
-    const post = await Post.findById(id)
+
+    // Ensure request body has all necessary data
+    if (
+      !userReplyComment ||
+      !replyCommentId ||
+      !replyCommentText ||
+      !replyingTo
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const post = await Post.findById(id);
+    const comment = post.comments.find(
+      (comment) => comment._id.toString() === replyCommentId
+    );
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    comment.replies.push({
+      replyCommentId: new mongoose.Types.ObjectId(),
+      userReplyComment,
+      replyCommentText,
+      replyingTo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    post.markModified("comments");
+    await post.save();
+    let updatedPost = await Post.findById(id)
       .populate({
         path: "comments.userComment",
         select: "_id firstName lastName picturePath location",
@@ -355,20 +538,11 @@ export const replyCommentPost = async (req, res) => {
       .populate({
         path: "userPost",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
-    const comment = post.comments.find(
-      (comment) => comment.commentId.toString() === replyCommentId
-    );
-    comment.replies.push({
-      replyCommentId: new mongoose.Types.ObjectId(),
-      userReplyComment,
-      replyCommentText,
-      replyingTo,
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    });
-    post.markModified("comments");
-    const updatedPost = await post.save();
 
     res.status(200).json(updatedPost);
   } catch (err) {
@@ -394,7 +568,20 @@ export const editReplyComment = async (req, res) => {
     }
     comment.commentText = newComment;
     post.markModified("comments");
-    const updatedPost = await post.save();
+    const updatedPost = await post
+      .save()
+      .populate({
+        path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "userPost",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
+      });
 
     res.status(200).json(updatedPost);
   } catch (err) {
@@ -435,6 +622,10 @@ export const restorePost = async (req, res) => {
       .populate({
         path: "userPost",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
     res.status(200).json(post);
   } catch (err) {
@@ -455,6 +646,10 @@ export const softDelete = async (req, res) => {
       .populate({
         path: "userPost",
         select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
       });
     res.status(200).json(remainPost);
   } catch (err) {
@@ -473,6 +668,10 @@ export const destroyPost = async (req, res) => {
       })
       .populate({
         path: "userPost",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
         select: "_id firstName lastName picturePath location",
       });
     res.status(200).json(remainPost);
