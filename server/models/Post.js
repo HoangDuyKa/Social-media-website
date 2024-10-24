@@ -49,6 +49,7 @@ const postSchema = mongoose.Schema(
       type: Map,
       of: Boolean,
     },
+    status: { type: String, enum: ["private", "public"], default: "public" },
     comments: [commentSchema],
     anniversariesCelebrated: { type: Number, default: 0 }, // Add this field
     isAnniversaryPost: { type: Boolean, default: false },

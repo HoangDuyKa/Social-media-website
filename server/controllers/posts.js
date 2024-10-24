@@ -132,9 +132,9 @@ export const createPost = async (req, res) => {
 
 export const getFeedPosts = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming userId is in req.user from authentication middleware
-    const { page = 1, limit = 5 } = req.query; // Default to page 1 and 5 posts per page
-    console.log(limit);
+    const userId = req.user.id;
+    const { page = 1, limit = 3 } = req.query; // Default to page 1 and 5 posts per page
+    // console.log(req.query);
 
     // Convert page and limit to numbers for calculation
     const pageNumber = parseInt(page, 10);
@@ -151,10 +151,11 @@ export const getFeedPosts = async (req, res) => {
     // Combine query to fetch posts, prioritizing user's and friends' posts
     const allPosts = await Post.find({
       $or: [
-        { userPost: { $in: idsToFetch } }, // Posts from the user and their friends
-        { userPost: { $nin: idsToFetch } }, // Posts from other users
+        { userPost: { $in: idsToFetch } },
+        { userPost: { $nin: idsToFetch } },
       ],
       isAnniversaryPost: false,
+      status: "public",
     })
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
@@ -177,8 +178,21 @@ export const getFeedPosts = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
   try {
+    const userLogin = req.user.id;
     const { userId } = req.params;
-    const post = await Post.find({ userPost: userId, isAnniversaryPost: false })
+    console.log("userLogin", userLogin);
+    console.log("userId", userId);
+    let status;
+    if (userLogin !== userId) {
+      status = "public";
+    } else {
+      status = { $in: ["public", "private"] };
+    }
+    const post = await Post.find({
+      userPost: userId,
+      isAnniversaryPost: false,
+      status,
+    })
       .populate("userPost", "_id firstName lastName picturePath location")
       .populate({
         path: "comments.userComment",
@@ -630,6 +644,70 @@ export const restorePost = async (req, res) => {
     res.status(200).json(post);
   } catch (err) {
     res.status(404).json({ message: err.message });
+  }
+};
+
+export const editStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log(id);
+
+    const post = await Post.findById(id);
+    console.log(post);
+    const isPublic = post.status === "public";
+    post.status = isPublic ? "private" : "public";
+    await post.save();
+
+    res.status(200).json(post);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const editPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { description, isDeletedFile } = req.body;
+    console.log(req.body);
+
+    const post = await Post.findById(id)
+      .populate({
+        path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "userPost",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
+      });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    if (req.file) {
+      post.file.path = req.file.path;
+      post.file.fileType = req.body.fileType;
+      post.file.fileName = req.body.fileName;
+      post.description = description;
+    } else if (isDeletedFile === true) {
+      post.file.path = "noFile";
+      post.description = description;
+      post.file.fileName = "";
+      post.file.fileType = "";
+    } else {
+      post.description = description;
+    }
+    await post.save();
+
+    res.status(200).json({ message: "Post updated successfully", post });
+  } catch (err) {
+    // If an error occurs, return a 500 status with the error message
+    console.log(err.message);
+    res.status(500).json({ message: err.message });
   }
 };
 

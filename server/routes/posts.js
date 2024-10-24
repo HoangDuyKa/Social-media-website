@@ -19,6 +19,8 @@ import {
   getUserMemory,
   savePost,
   unsavePost,
+  editStatus,
+  editPost,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 import { upload } from "../utils/upload.js";
@@ -48,6 +50,8 @@ router.patch("/:id/replyComment", verifyToken, replyCommentPost);
 router.patch("/:id/deleteReplyComment", verifyToken, deleteReplyComment);
 router.put("/:id/editReplyComment", verifyToken, editReplyComment);
 router.patch("/:id/restore", verifyToken, restorePost);
+router.patch("/:id/status", verifyToken, editStatus);
+router.put("/:id/edit", verifyToken, upload.single("file"), editPost);
 
 /* DELETE */
 router.delete("/:id", verifyToken, softDelete);

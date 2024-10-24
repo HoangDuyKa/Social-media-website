@@ -1,14 +1,19 @@
 import {
   ChatBubbleOutlineOutlined,
+  Check,
+  Close,
+  Delete,
   FavoriteBorderOutlined,
   FavoriteOutlined,
   ShareOutlined,
+  Undo,
 } from "@mui/icons-material";
 import {
   Box,
   Divider,
   IconButton,
   Stack,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -20,6 +25,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "Redux/Slice/app";
+import _ from "lodash";
 
 const PostWidget = ({
   postId,
@@ -36,9 +42,13 @@ const PostWidget = ({
   storagePage,
   isAnniversaryPost,
   anniversariesCelebrated,
+  statusPost,
 }) => {
   const [isComments, setIsComments] = useState(detailPost);
   const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
+  const [editingPost, setEditingPost] = useState(false);
+  const [descriptionText, setDescriptionText] = useState(description);
+  const [fileEdit, setFileEdit] = useState(file);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
   const loggedInUser = useSelector((state) => state.auth.user);
@@ -46,11 +56,27 @@ const PostWidget = ({
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const time = "12 hours ago";
+  // const [isDeletedFile, setIsDeletedFile] = useState(false);
+
+  const [isDeletedFile, setIsDeletedFile] = useState(false);
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
   const apiUrl = process.env.REACT_APP_API_URL;
+  const handleDeleteFile = () => {
+    setIsDeletedFile(true);
+    setFileEdit(null);
+  };
+
+  const handleUndoDeleteFile = () => {
+    setIsDeletedFile(false);
+    setFileEdit(file);
+  };
+
+  const handleFileUpload = (newFile) => {
+    setFileEdit(newFile);
+  };
 
   const patchLike = async () => {
     try {
@@ -66,6 +92,54 @@ const PostWidget = ({
       if (updatedPost.error) throw new Error(updatedPost.error);
 
       dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const editPost = async () => {
+    try {
+      const formData = new FormData();
+
+      formData.append("description", descriptionText);
+      formData.append("isDeletedFile", isDeletedFile);
+      // check if any file changed and file not null
+      if (!_.isEqual(file, fileEdit) && fileEdit !== null) {
+        let fileTypeEdit;
+        if (fileEdit.type.includes("image/")) {
+          fileTypeEdit = "Image";
+        } else if (fileEdit.type.includes("video/")) {
+          fileTypeEdit = "Video";
+        } else if (fileEdit.type.includes("audio/")) {
+          fileTypeEdit = "Audio";
+        } else {
+          fileTypeEdit = "File";
+        }
+        formData.append("file", fileEdit);
+        formData.append("fileType", fileTypeEdit);
+        formData.append("fileName", fileEdit.name);
+      }
+
+      const response = await fetch(`${apiUrl}/posts/${postId}/edit`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        // body: JSON.stringify({
+        //   description: descriptionText,
+        // }),
+        body: formData,
+      });
+      const data = await response.json();
+      setFileEdit(data.post.file);
+      dispatch(setPost({ post: data.post }));
+      if (!_.isEqual(file, fileEdit) || description !== descriptionText) {
+        toast.success(data.message);
+      } else {
+        toast.info("Nothing to change");
+      }
+      if (data.error) throw new Error(data.error);
+      dispatch(setPost({ post: data }));
     } catch (error) {
       toast.error(error.message);
     }
@@ -233,72 +307,115 @@ const PostWidget = ({
         trashPosts={trashPosts}
         storagePage={storagePage}
         isAnniversaryPost={isAnniversaryPost}
+        statusPost={statusPost}
+        editingPost={editingPost}
+        setEditingPost={setEditingPost}
       />
-      <Typography color={main} sx={{ mt: "1rem" }}>
-        {description}
-      </Typography>
-      {/* {picturePath !== "noFile" && picturePath.split(" ")[0] === "image" && (
-        <img
-          width="100%"
-          height="auto"
-          alt="post"
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          // src={`http://localhost:3001/assets/${picturePath}`}
-          src={picturePath.split(" ")[1]}
-        />
-      )}
-      {picturePath !== "noFile" && picturePath.split(" ")[0] === "video" && (
-        <video
-          width="100%"
-          height="auto"
-          alt="post"
-          controls
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          // src={`http://localhost:3001/assets/${picturePath}`}
-        >
-          <source src={picturePath.split(" ")[1]}></source>
-        </video>
-      )} */}
 
-      {file?.fileType === "Image" && (
-        <img
-          width="100%"
-          height="auto"
-          alt="post"
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={file.path}
-        />
+      {editingPost ? (
+        <>
+          <TextField
+            variant="outlined"
+            fullWidth
+            value={descriptionText}
+            onChange={(e) => setDescriptionText(e.target.value)}
+            placeholder={"Please enter your description"}
+            multiline
+            maxRows={4}
+            sx={{ ml: 2, mr: 2 }}
+            InputProps={{
+              sx: {
+                borderRadius: 2,
+              },
+            }}
+          />
+          <Stack direction="row" justifyContent="flex-end" spacing={1}>
+            <IconButton size="small" onClick={() => setEditingPost(false)}>
+              <Close fontSize="small" />
+            </IconButton>
+            <IconButton
+              sx={{
+                float: "right",
+                borderRadius: "3rem",
+                marginLeft: 1,
+                p: "4px 16px",
+              }}
+              onClick={() => {
+                editPost(descriptionText);
+                setEditingPost(!editingPost);
+              }}
+            >
+              <Check fontSize="small" />
+            </IconButton>
+          </Stack>
+
+          {(fileEdit === null || fileEdit?.path === "noFile") && (
+            <input
+              type="file"
+              accept="image/*,video/*,audio/*,application/pdf" // Specify allowed file types
+              onChange={(e) => handleFileUpload(e.target.files[0])}
+            />
+          )}
+        </>
+      ) : (
+        <Typography color={main} sx={{ mt: "1rem" }}>
+          {description}
+        </Typography>
       )}
 
-      {file?.fileType === "Video" && (
-        <video
-          width="100%"
-          height="auto"
-          alt="post"
-          controls
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-        >
-          <source src={file.path}></source>
-        </video>
+      {fileEdit?.fileType === "Image" && (
+        <div>
+          <img
+            width="100%"
+            height="auto"
+            alt="post"
+            style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+            src={fileEdit.path}
+          />
+          {/* {editingPost && (
+            <IconButton onClick={handleDeleteFile}>
+              <Delete />
+            </IconButton>
+          )} */}
+        </div>
       )}
 
-      {file?.fileType === "File" && (
+      {fileEdit?.fileType === "Video" && (
+        <div>
+          <video
+            width="100%"
+            height="auto"
+            alt="post"
+            controls
+            style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+          >
+            <source src={fileEdit.path}></source>
+          </video>
+          {/* {editingPost && (
+            <IconButton onClick={handleDeleteFile}>
+              <Delete />
+            </IconButton>
+          )} */}
+        </div>
+      )}
+
+      {fileEdit?.fileType === "File" && (
         <div>
           {/* <h3>Document Preview</h3> */}
           <a
-            href={file.path}
+            href={fileEdit.path}
             target="_blank"
             // download={file.fileName}
             rel="noopener noreferrer"
           >
             Open Document{" "}
           </a>
-          {file.fileName}
+          {fileEdit.fileName}
           <br />
           {/* <a href={file.path} download={file.fileName}>
             Download Document
           </a> */}
-          {file.path.endsWith(".pdf") && (
+          {fileEdit.path.endsWith(".pdf") && (
             <div>
               {/* <IconButton >
                 <ChatBubbleOutlineOutlined sx={{ color: primary }} />
@@ -315,9 +432,14 @@ const PostWidget = ({
               >
                 Preview file here
               </Typography>
+              {/* {editingPost && (
+                <IconButton onClick={handleDeleteFile}>
+                  <Delete />
+                </IconButton>
+              )} */}
               {isPreviewPDF && (
                 <iframe
-                  src={file.path}
+                  src={fileEdit.path}
                   // src="https://www.clickdimensions.com/links/TestPDFfile.pdf"
                   // width="840"
                   width={"100%"}
@@ -340,10 +462,23 @@ const PostWidget = ({
         // </div>
       )}
 
-      {file?.fileType === "Audio" && (
-        <audio controls>
-          <source src={file.path} />
-        </audio>
+      {fileEdit?.fileType === "Audio" && (
+        <div>
+          <audio controls>
+            <source src={fileEdit.path} />
+          </audio>
+        </div>
+      )}
+      {editingPost && !isDeletedFile && fileEdit.path !== "noFile" && (
+        <IconButton onClick={handleDeleteFile}>
+          <Delete />
+        </IconButton>
+      )}
+
+      {editingPost && isDeletedFile && (
+        <IconButton onClick={handleUndoDeleteFile}>
+          <Undo />
+        </IconButton>
       )}
 
       <FlexBetween mt="0.25rem">

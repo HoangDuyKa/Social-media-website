@@ -236,11 +236,13 @@ const PostsWidget = ({
                   likes,
                   comments,
                   anniversariesCelebrated,
+                  status,
                 }) => (
                   <PostWidget
                     key={_id}
                     postId={_id}
                     postUserId={userPost?._id}
+                    statusPost={status}
                     name={`${userPost?.firstName} ${userPost?.lastName}`}
                     description={description}
                     location={userPost?.location}
@@ -291,6 +293,7 @@ const PostsWidget = ({
                 likes,
                 comments,
                 anniversariesCelebrated,
+                status,
               }) => (
                 // <PostWidget
                 //   key={_id}
@@ -309,6 +312,7 @@ const PostsWidget = ({
                 <PostWidget
                   key={_id}
                   postId={_id}
+                  statusPost={status}
                   postUserId={userPost?._id}
                   name={`${userPost?.firstName} ${userPost?.lastName}`}
                   description={description}

@@ -1,8 +1,11 @@
 import {
   Delete,
   DeleteForever,
+  Edit,
+  Lock,
   PersonAddOutlined,
   PersonRemoveOutlined,
+  PrivacyTipRounded,
   Public,
   ReportGmailerrorred,
   Save,
@@ -25,9 +28,9 @@ import { toast } from "sonner";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 import StyledBadge from "./StyledBadge";
-import { DotsThreeVertical } from "phosphor-react";
+import { DotsThreeVertical, Pencil } from "phosphor-react";
 import { useState } from "react";
-import { setPosts } from "Redux/Slice/app";
+import { setPost, setPosts } from "Redux/Slice/app";
 
 const Friend = ({
   friendId,
@@ -41,6 +44,9 @@ const Friend = ({
   storagePage,
   userId,
   isAnniversaryPost,
+  statusPost,
+  editingPost,
+  setEditingPost,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -69,6 +75,24 @@ const Friend = ({
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       dispatch(setFriends({ friends: data }));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const patchStatus = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/posts/${postId}/status`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+      if (data.error) throw new Error(data.error);
+      dispatch(setPost({ post: data }));
     } catch (error) {
       toast.error(error.message);
     }
@@ -181,104 +205,120 @@ const Friend = ({
   const online = onlineUsers.includes(friendId);
 
   return (
-    <FlexBetween>
-      <FlexBetween gap="1rem">
-        {online ? (
-          <StyledBadge
-            overlap="circular"
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            variant="dot"
-          >
+    <>
+      <FlexBetween>
+        <FlexBetween gap="1rem">
+          {online ? (
+            <StyledBadge
+              overlap="circular"
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              variant="dot"
+            >
+              <UserImage image={userPicturePath} size="55px" />
+            </StyledBadge>
+          ) : (
             <UserImage image={userPicturePath} size="55px" />
-          </StyledBadge>
-        ) : (
-          <UserImage image={userPicturePath} size="55px" />
-        )}
+          )}
 
-        <Box>
-          <Box
-            onClick={() => {
-              navigate(`/profile/${friendId}`);
-              navigate(0);
-            }}
-          >
-            <Typography
-              color={main}
-              variant="h5"
-              fontWeight="500"
-              sx={{
-                maxWidth: "200px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                "&:hover": {
-                  color: palette.primary.light,
-                  cursor: "pointer",
-                },
-              }}
-            >
-              {name}
-            </Typography>
-          </Box>
-          {postId ? (
-            <Typography
-              sx={{
-                "&:hover": {
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                },
-              }}
-              color={medium}
-              fontSize="0.75rem"
+          <Box>
+            <Box
               onClick={() => {
-                navigate(`/detail/post/${postId}`);
+                navigate(`/profile/${friendId}`);
+                navigate(0);
               }}
             >
-              {subtitle}
-            </Typography>
-          ) : (
-            <Typography color={medium} fontSize="0.75rem">
-              {subtitle}
-            </Typography>
-          )}
-        </Box>
+              <Typography
+                color={main}
+                variant="h5"
+                fontWeight="500"
+                sx={{
+                  maxWidth: "200px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  "&:hover": {
+                    color: palette.primary.light,
+                    cursor: "pointer",
+                  },
+                  display: "flex",
+                }}
+              >
+                {name}
+                {postId ? (
+                  statusPost === "public" ? (
+                    <Public sx={{ marginLeft: 1 }} />
+                  ) : (
+                    <Lock sx={{ marginLeft: 1 }} />
+                  )
+                ) : (
+                  <></>
+                )}
+              </Typography>
+            </Box>
+            {postId ? (
+              <Typography
+                sx={{
+                  "&:hover": {
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  },
+                }}
+                color={medium}
+                fontSize="0.75rem"
+                onClick={() => {
+                  navigate(`/detail/post/${postId}`);
+                }}
+              >
+                {subtitle}
+              </Typography>
+            ) : (
+              <Typography color={medium} fontSize="0.75rem">
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
+        </FlexBetween>
+        {postId ? (
+          <IconButton
+            // onClick={() => patchFriend()}
+            sx={{ backgroundColor: primaryLight }}
+          >
+            <PostOption
+              sx={{ color: primaryDark }}
+              patchFriend={patchFriend}
+              isFriend={isFriend}
+              postUserId={postUserId}
+              _id={_id}
+              trashPosts={trashPosts}
+              softDeletePost={softDeletePost}
+              destroyPost={destroyPost}
+              restorePost={restorePost}
+              savePost={savePost}
+              storagePage={storagePage}
+              unsavePost={unsavePost}
+              isAnniversaryPost={isAnniversaryPost}
+              patchStatus={patchStatus}
+              statusPost={statusPost}
+              setEditingPost={setEditingPost}
+              editingPost={editingPost}
+            />
+          </IconButton>
+        ) : userId === _id ? (
+          <></>
+        ) : (
+          <IconButton
+            onClick={() => patchFriend()}
+            sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+          >
+            {isFriend ? (
+              <PersonRemoveOutlined sx={{ color: primaryDark }} />
+            ) : (
+              <PersonAddOutlined sx={{ color: primaryDark }} />
+            )}
+          </IconButton>
+        )}
       </FlexBetween>
-      {postId ? (
-        <IconButton
-          // onClick={() => patchFriend()}
-          sx={{ backgroundColor: primaryLight }}
-        >
-          <PostOption
-            sx={{ color: primaryDark }}
-            patchFriend={patchFriend}
-            isFriend={isFriend}
-            postUserId={postUserId}
-            _id={_id}
-            trashPosts={trashPosts}
-            softDeletePost={softDeletePost}
-            destroyPost={destroyPost}
-            restorePost={restorePost}
-            savePost={savePost}
-            storagePage={storagePage}
-            unsavePost={unsavePost}
-            isAnniversaryPost={isAnniversaryPost}
-          />
-        </IconButton>
-      ) : userId === _id ? (
-        <></>
-      ) : (
-        <IconButton
-          onClick={() => patchFriend()}
-          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-        >
-          {isFriend ? (
-            <PersonRemoveOutlined sx={{ color: primaryDark }} />
-          ) : (
-            <PersonAddOutlined sx={{ color: primaryDark }} />
-          )}
-        </IconButton>
-      )}
-    </FlexBetween>
+    </>
   );
 };
 
@@ -295,6 +335,11 @@ const PostOption = ({
   storagePage,
   unsavePost,
   isAnniversaryPost,
+  patchStatus,
+  statusPost,
+  editPost,
+  setEditingPost,
+  editingPost,
 }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -343,13 +388,35 @@ const PostOption = ({
 
         {
           title: "Report",
+
           icon: <ReportGmailerrorred />,
         },
       ]
     : [
+        statusPost === "public"
+          ? {
+              title: "Set Status Private",
+
+              handleClick: () => {
+                patchStatus().then(navigate(`/profile/${_id}`));
+              },
+              icon: <Lock />,
+            }
+          : {
+              title: "Set Status Public",
+
+              handleClick: () => {
+                patchStatus().then(navigate("/"));
+              },
+              icon: <Public />,
+            },
         {
-          title: "Set Status Post",
-          icon: <Public />,
+          title: "Edit Post",
+          handleClick: () => {
+            setEditingPost(!editingPost);
+            handleClose();
+          },
+          icon: <Edit />,
         },
         {
           title: "Delete Post",
