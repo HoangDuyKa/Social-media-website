@@ -26,7 +26,10 @@ import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "Redux/Slice/app";
 import _ from "lodash";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
+dayjs.extend(relativeTime);
 const PostWidget = ({
   postId,
   postUserId,
@@ -43,6 +46,7 @@ const PostWidget = ({
   isAnniversaryPost,
   anniversariesCelebrated,
   statusPost,
+  createdAt,
 }) => {
   const [isComments, setIsComments] = useState(detailPost);
   const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
@@ -55,7 +59,7 @@ const PostWidget = ({
   const loggedInUserId = loggedInUser._id;
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
-  const time = "12 hours ago";
+  // const time = "12 hours ago";
   // const [isDeletedFile, setIsDeletedFile] = useState(false);
 
   const [isDeletedFile, setIsDeletedFile] = useState(false);
@@ -299,7 +303,8 @@ const PostWidget = ({
         friendId={postUserId}
         name={name}
         // subtitle={location}
-        subtitle={time}
+        // subtitle={time}
+        subtitle={dayjs(createdAt).fromNow()}
         userPicturePath={userPicturePath}
         // isPost={true}
         postUserId={postUserId}

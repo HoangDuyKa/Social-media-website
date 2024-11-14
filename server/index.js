@@ -13,6 +13,7 @@ import Router from "./routes/index.js";
 import { app, server } from "./socket/socket.js";
 import connectToMongoDB from "./configs/db.js";
 import { createAnniversaryPosts } from "./controllers/posts.js";
+import Post from "./models/Post.js";
 // import { sendMessage } from "./controllers/message.js";
 // import { updateUser } from "./controllers/users.js";
 // import { upload } from "./utils/upload.js";
@@ -82,8 +83,8 @@ cron.schedule("0 0 * * *", async () => {
 
 // // check auto after a minute
 // cron.schedule("* * * * *", async () => {
+//   createAnniversaryPosts();
 //   console.log("Running the anniversary check...");
-//   await createAnniversaryPosts();
 // });
 
 server.listen(PORT, () => {

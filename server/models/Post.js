@@ -53,7 +53,8 @@ const postSchema = mongoose.Schema(
     comments: [commentSchema],
     anniversariesCelebrated: { type: Number, default: 0 }, // Add this field
     isAnniversaryPost: { type: Boolean, default: false },
-    alreadyAniversary: { type: Boolean, default: false },
+    // alreadyAniversary: { type: Boolean, default: false },
+    alreadyAniversary: { type: String, default: "None" },
   },
   { timestamps: true }
 );

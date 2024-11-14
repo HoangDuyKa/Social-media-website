@@ -21,6 +21,7 @@ import {
   unsavePost,
   editStatus,
   editPost,
+  adminDestroyPost,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 import { upload } from "../utils/upload.js";
@@ -56,6 +57,7 @@ router.put("/:id/edit", verifyToken, upload.single("file"), editPost);
 /* DELETE */
 router.delete("/:id", verifyToken, softDelete);
 router.delete("/:id/force", verifyToken, destroyPost);
+router.delete("/:id/adminForce", verifyToken, adminDestroyPost);
 router.delete("/:postId/unsave", verifyToken, unsavePost);
 
 /* READ */

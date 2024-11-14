@@ -33,107 +33,30 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find({ isAnniversaryPost: false })
+    const post = await Post.find({ isAnniversaryPost: false, status: "public" })
       .populate("userPost", "_id firstName lastName picturePath location")
       .sort({ createdAt: -1 });
     res.status(201).json(post);
+
+    // setTimeout(async () => {
+    //   await Post.findByIdAndUpdate(newPost._id, { isAnniversaryPost: true });
+    //   console.log(`Post ${newPost._id} transformed into a memory post.`);
+    // }, 31536000000); // 1 year in milliseconds
+
+    // const post = await Post.find({ isAnniversaryPost: false, status: "public" })
+    //   .populate("userPost", "_id firstName lastName picturePath location")
+    //   .sort({ createdAt: -1 });
+    // res.status(201).json(post);
   } catch (err) {
     res.status(409).json({ error: err.message });
   }
 };
 
 /* READ */
-// export const getFeedPosts = async (req, res) => {
-//   try {
-//     const post = await Post.find({ isAnniversaryPost: false })
-//       .populate("userPost", "_id firstName lastName picturePath location")
-//       .populate({
-//         path: "comments.userComment",
-//         select: "_id firstName lastName picturePath location",
-//       });
-//     res.status(200).json(post);
-//   } catch (err) {
-//     res.status(404).json({ message: err.message });
-//   }
-// };
-// export const getFeedPosts = async (req, res) => {
-//   try {
-//     const userId = req.user.id; // Assuming userId is in req.user from authentication middleware
-//     const { page, limit } = req.query; // Default to page 1 and 5 posts per page
-
-//     // Convert page and limit to numbers for calculation
-//     const pageNumber = parseInt(page, 10);
-//     const limitNumber = parseInt(limit, 10);
-//     console.log(limitNumber);
-
-//     // Find the user and get their friends
-//     const user = await User.findById(userId).select("friends");
-
-//     // Combine userId and friends' ids to create an array of all users to fetch posts from
-//     const idsToFetch = [
-//       new mongoose.Types.ObjectId(userId),
-//       ...user.friends.map((friendId) => new mongoose.Types.ObjectId(friendId)),
-//     ];
-
-//     // const userAndFriendsPosts = await Post.find({
-//     //   userPost: { $in: idsToFetch },
-//     // })
-//     //   .populate("userPost", "_id firstName lastName picturePath location")
-//     //   .populate({
-//     //     path: "comments.userComment",
-//     //     select: "_id firstName lastName picturePath location",
-//     //   })
-//     //   .populate({
-//     //     path: "comments.replies.userReplyComment",
-//     //     select: "_id firstName lastName picturePath location",
-//     //   })
-//     //   .sort({ createdAt: -1 }) // Sort by latest creation time
-//     //   .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
-//     //   .limit(limitNumber); // Limit the number of posts returned
-
-//     // // Fetch the remaining posts that are not from the user or their friends
-//     // const otherPosts = await Post.find({ userPost: { $nin: idsToFetch } })
-//     //   .populate("userPost", "_id firstName lastName picturePath location")
-//     //   .populate({
-//     //     path: "comments.userComment",
-//     //     select: "_id firstName lastName picturePath location",
-//     //   })
-//     //   .populate({
-//     //     path: "comments.replies.userReplyComment",
-//     //     select: "_id firstName lastName picturePath location",
-//     //   })
-//     //   .sort({ createdAt: -1 }) // Sort by latest creation time
-//     //   .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
-//     //   .limit(limitNumber); // Limit the number of posts returned
-//     // // Combine both arrays: user and friends' posts first, followed by the remaining posts
-//     // const allPosts = [...userAndFriendsPosts, ...otherPosts];
-
-//     const allPosts = await Post.find({
-//       // userPost: { $in: idsToFetch },
-//     })
-//       .populate("userPost", "_id firstName lastName picturePath location")
-//       .populate({
-//         path: "comments.userComment",
-//         select: "_id firstName lastName picturePath location",
-//       })
-//       .populate({
-//         path: "comments.replies.userReplyComment",
-//         select: "_id firstName lastName picturePath location",
-//       })
-//       .sort({ createdAt: -1 })
-//       .skip((pageNumber - 1) * limitNumber) // Skip previous pages' posts
-//       .limit(limitNumber); // Limit the number of posts returned
-
-//     res.status(200).json(allPosts);
-//   } catch (err) {
-//     res.status(404).json({ message: err.message });
-//   }
-// };
-
 export const getFeedPosts = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { page = 1, limit = 3 } = req.query; // Default to page 1 and 5 posts per page
+    const { page, limit } = req.query; // Default to page 1 and 5 posts per page
     // console.log(req.query);
 
     // Convert page and limit to numbers for calculation
@@ -758,6 +681,29 @@ export const destroyPost = async (req, res) => {
   }
 };
 
+export const adminDestroyPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Post.deleteOne({ _id: id });
+    const remainPost = await Post.findWithDeleted()
+      .populate({
+        path: "comments.userComment",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "userPost",
+        select: "_id firstName lastName picturePath location",
+      })
+      .populate({
+        path: "comments.replies.userReplyComment",
+        select: "_id firstName lastName picturePath location",
+      });
+    res.status(200).json(remainPost);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
 export const savePost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -811,36 +757,66 @@ export const createAnniversaryPosts = async () => {
         $lte: endOfDayAnniversary,
       },
       deleted: false,
-      alreadyAniversary: false,
+      // alreadyAniversary: false,
     });
 
     for (const post of posts) {
-      const years = currentDate.getFullYear() - post.createdAt.getFullYear();
+      const yearsSinceCreation =
+        currentDate.getFullYear() - post.createdAt.getFullYear();
+      console.log(post.anniversariesCelebrated !== yearsSinceCreation);
+      if (post.anniversariesCelebrated !== yearsSinceCreation) {
+        if (post.alreadyAniversary === "None") {
+          const newPost = new Post({
+            userPost: post.userPost,
+            description: post.description,
+            file: post.file,
+            likes: [],
+            comments: [],
+            isAnniversaryPost: true,
+            anniversariesCelebrated: yearsSinceCreation,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
 
-      const newPost = new Post({
-        userPost: post.userPost,
-        description: post.description,
-        file: post.file,
-        likes: [],
-        comments: [],
-        isAnniversaryPost: true,
-        anniversariesCelebrated: years,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+          try {
+            post.alreadyAniversary = newPost._id;
+            post.anniversariesCelebrated = yearsSinceCreation;
+            await post.save();
+            await newPost.save();
+            console.log(
+              `Created anniversary post for original post ID: ${post._id}`
+            );
+          } catch (error) {
+            console.error(
+              `Error creating anniversary post for post ID: ${post._id}`,
+              error
+            );
+          }
+        } else {
+          try {
+            const _id = post.alreadyAniversary;
+            console.log(_id);
+            const anniversaryPost = await Post.findById({ _id });
 
-      try {
-        post.alreadyAniversary = true;
-        await post.save();
-        await newPost.save();
-        console.log(
-          `Created anniversary post for original post ID: ${post._id}`
-        );
-      } catch (error) {
-        console.error(
-          `Error creating anniversary post for post ID: ${post._id}`,
-          error
-        );
+            if (anniversaryPost) {
+              anniversaryPost.anniversariesCelebrated = yearsSinceCreation;
+              anniversaryPost.updatedAt = new Date();
+              await anniversaryPost.save();
+              console.log(
+                `Updated anniversary post ID: ${anniversaryPost._id} to anniversariesCelebrated: ${anniversaryPost.anniversariesCelebrated}`
+              );
+            } else {
+              console.error(
+                `Anniversary post with ID: ${post.alreadyAniversary} not found`
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error updating anniversary post for original post ID: ${post._id}`,
+              error
+            );
+          }
+        }
       }
     }
   }

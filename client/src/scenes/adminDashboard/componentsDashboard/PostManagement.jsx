@@ -67,7 +67,6 @@ const PostManagement = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
-      console.log(data);
 
       // Map the fetched data to match the DataGrid row format
       const formattedPosts = data.map((post) => ({
@@ -84,7 +83,7 @@ const PostManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${apiUrl}/posts/${id}/force`, {
+      const response = await fetch(`${apiUrl}/posts/${id}/adminForce`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

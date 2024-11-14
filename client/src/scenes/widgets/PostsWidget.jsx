@@ -237,6 +237,7 @@ const PostsWidget = ({
                   comments,
                   anniversariesCelebrated,
                   status,
+                  createdAt,
                 }) => (
                   <PostWidget
                     key={_id}
@@ -255,6 +256,7 @@ const PostsWidget = ({
                     detailPost={detailPost}
                     isAnniversaryPost={isAnniversaryPost}
                     anniversariesCelebrated={anniversariesCelebrated}
+                    createdAt={createdAt}
                   />
                 )
               )}
@@ -294,6 +296,7 @@ const PostsWidget = ({
                 comments,
                 anniversariesCelebrated,
                 status,
+                createdAt,
               }) => (
                 // <PostWidget
                 //   key={_id}
@@ -326,6 +329,7 @@ const PostsWidget = ({
                   detailPost={detailPost}
                   isAnniversaryPost={isAnniversaryPost}
                   anniversariesCelebrated={anniversariesCelebrated}
+                  createdAt={createdAt}
                 />
               )
             )
