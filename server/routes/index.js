@@ -9,6 +9,7 @@ import notificationRoutes from "./notification.js";
 import searchRoutes from "./search.js";
 import adsRoutes from "./ads.js";
 
+/* All main routes */
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/posts", postRoutes);

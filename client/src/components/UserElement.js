@@ -13,6 +13,7 @@ import { Chat } from "phosphor-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "Redux/Slice/auth";
 import { getSocket } from "socket";
+import { useNavigate } from "react-router-dom";
 
 const user_id = window.localStorage.getItem("user_id");
 
@@ -174,6 +175,7 @@ const FriendRequestElement = ({
             onClick={() => {
               //  emit "accept_request" event
               socket.emit("accept_request", { request_id: id });
+              window.location.reload(); // Refresh the page
             }}
           >
             Accept Request

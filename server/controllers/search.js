@@ -1,6 +1,7 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 
+/* READ */
 export const getSearchs = async (req, res) => {
   try {
     const { query } = req.query;
@@ -20,7 +21,8 @@ export const getSearchs = async (req, res) => {
       });
 
       // Tìm kiếm bài viết theo mô tả
-      posts = await Post.find({
+      posts = await Post.find({isAnniversaryPost: false,
+        status:"public",
         description: { $regex: query, $options: "i" },
       })
         .populate({

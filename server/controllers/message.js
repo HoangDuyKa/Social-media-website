@@ -2,6 +2,7 @@ import Conversation from "../models/conversation.js";
 import Message from "../models/message.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
+/* CREATE */
 export const sendMessage = async (req, res) => {
   try {
     const { id: receiverId } = req.params;
@@ -52,6 +53,7 @@ export const sendMessage = async (req, res) => {
   }
 };
 
+/* READ */
 export const getMessages = async (req, res) => {
   try {
     const { id: userToChatId } = req.params;

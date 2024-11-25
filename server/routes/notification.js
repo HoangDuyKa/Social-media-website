@@ -6,7 +6,10 @@ import {
 
 const router = express.Router();
 
+/* READ */
 router.get("/:userId", getNotifications);
+
+/* UPDATE */
 router.patch("/updateNotification/:id", updateNotificationStatus);
 
 export default router;

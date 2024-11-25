@@ -2,6 +2,7 @@ import Notification from "../models/Notification.js";
 import User from "../models/User.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 
+/* CREATE */
 export const createNotifications = async (
   id, // id of placeId
   // senderImage,
@@ -83,6 +84,7 @@ export const createNotifications = async (
   }
 };
 
+/* READ */
 export const getNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -98,6 +100,7 @@ export const getNotifications = async (req, res) => {
   }
 };
 
+/* UPDATE */
 export const updateNotificationStatus = async (req, res) => {
   const { id } = req.params;
   const { isRead } = req.body;

@@ -99,6 +99,7 @@ function App() {
                 )
               }
             />
+            <Route path="/video-call/:roomId" component={VideoCall} />
             {/* <Route
               path="/searchWithAI"
               element={
@@ -135,6 +136,7 @@ const MemoryPage = Loadable(lazy(() => import("scenes/memoryPage")));
 const DetailPost = Loadable(lazy(() => import("scenes/detailPost")));
 const SearchPage = Loadable(lazy(() => import("scenes/searchPage")));
 const AdminDashboard = Loadable(lazy(() => import("scenes/adminDashboard")));
+const VideoCall = Loadable(lazy(() => import("components/VideoCall")));
 const SearchPageWithAIGenerateImage = Loadable(
   lazy(() => import("scenes/SearchPageWithAIGenerateImage"))
 );

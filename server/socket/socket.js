@@ -5,7 +5,6 @@ import cors from "cors";
 import User from "../models/User.js";
 import FriendRequest from "../models/friendRequest.js";
 // import Message from "../models/message.js";
-import OneToOneMessage from "../models/OneToOneMessage.js";
 import Conversation from "../models/conversation.js";
 
 const app = express();
@@ -81,7 +80,7 @@ io.on("connection", async (socket) => {
       participants: { $size: 2, $all: [receiver._id, sender._id] },
     }).populate("participants", "firstName lastName _id email status");
 
-    console.log(existing_conversations[0], "Existing Conversation");
+    // console.log(existing_conversations[0], "Existing Conversation");
 
     if (existing_conversations.length === 0) {
       let new_chat = await Conversation.create({
@@ -94,9 +93,6 @@ io.on("connection", async (socket) => {
       );
     }
 
-    // delete this request doc
-    // emit event to both of them
-
     // emit event request accepted to both
     io.to(sender?.socket_id).emit("request_accepted", {
       message: "Friend Request Accepted",
@@ -106,10 +102,7 @@ io.on("connection", async (socket) => {
     });
   });
 
-  // console.log(userSocketMap);
-
   //Messages
-
   socket.on("get_direct_conversations", async ({ user_id }, callback) => {
     const existing_conversations = await Conversation.find({
       participants: { $all: [user_id] },
@@ -119,127 +112,36 @@ io.on("connection", async (socket) => {
         "firstName lastName picturePath _id email status"
       )
       .populate("messages", "message");
-    // console.log(user_id);
-
-    // db.books.find({ authors: { $elemMatch: { name: "John Smith" } } })
-
-    // console.log("haha", existing_conversations);
 
     callback(existing_conversations);
   });
 
-  // socket.on("start_conversation", async (data) => {
-  //   // data: {to: from:}
+  // Join Room
+  socket.on("join-room", (roomId) => {
+    console.log(`User ${socket.id} joined room ${roomId}`);
+    socket.join(roomId);
 
-  //   const { to, from } = data;
-  //   // console.log(data);
+    socket.to(roomId).emit("user-connected", socket.id);
 
-  //   // check if there is any existing conversation
-
-  //   const existing_conversations = await Conversation.find({
-  //     participants: { $size: 2, $all: [to, from] },
-  //   }).populate("participants", "firstName lastName _id email status");
-
-  //   console.log(existing_conversations[0], "Existing Conversation");
-
-  //   if (existing_conversations.length === 0) {
-  //     let new_chat = await Conversation.create({
-  //       participants: [to, from],
-  //     });
-
-  //     new_chat = await Conversation.findById(new_chat).populate(
-  //       "participants",
-  //       "firstName lastName _id email status"
-  //     );
-
-  //     // console.log(new_chat);
-
-  //     socket.emit("start_chat", new_chat);
-  //   }
-  //   // if yes => just emit event "start_chat" & send conversation details as payload
-  //   else {
-  //     socket.emit("start_chat", existing_conversations[0]);
-  //   }
-  // });
-
-  socket.on("get_messages", async (data, callback) => {
-    try {
-      const { messages } = await OneToOneMessage.findById(
-        data.conversation_id
-      ).select("messages");
-      callback(messages);
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // Handle incoming text/link messages
-  socket.on("text_message", async (data) => {
-    console.log("Received message:", data);
-
-    // data: {to, from, text}
-
-    const { message, conversation_id, from, to, type } = data;
-
-    const to_user = await User.findById(to);
-    const from_user = await User.findById(from);
-
-    // message => {to, from, type, created_at, text, file}
-
-    const new_message = {
-      to: to,
-      from: from,
-      type: type,
-      created_at: Date.now(),
-      text: message,
-    };
-
-    // fetch OneToOneMessage Doc & push a new message to existing conversation
-    const chat = await OneToOneMessage.findById(conversation_id);
-    chat.messages.push(new_message);
-    // save to db`
-    await chat.save({ new: true, validateModifiedOnly: true });
-
-    // emit incoming_message -> to user
-
-    io.to(to_user?.socket_id).emit("new_message", {
-      conversation_id,
-      message: new_message,
-    });
-
-    // emit outgoing_message -> from user
-    io.to(from_user?.socket_id).emit("new_message", {
-      conversation_id,
-      message: new_message,
+    // Handle disconnection
+    socket.on("disconnect", () => {
+      console.log(`User ${socket.id} disconnected`);
+      socket.to(roomId).emit("user-disconnected", socket.id);
     });
   });
 
-  // handle Media/Document Message
-  socket.on("file_message", (data) => {
-    console.log("Received message:", data);
-
-    // data: {to, from, text, file}
-
-    // Get the file extension
-    const fileExtension = path.extname(data.file.name);
-
-    // Generate a unique filename
-    const filename = `${Date.now()}_${Math.floor(
-      Math.random() * 10000
-    )}${fileExtension}`;
-
-    // upload file to AWS s3
-
-    // create a new conversation if its dosent exists yet or add a new message to existing conversation
-
-    // save to db
-
-    // emit incoming_message -> to user
-
-    // emit outgoing_message -> from user
+  // Handle WebRTC Signaling
+  socket.on("offer", (roomId, offer) => {
+    socket.to(roomId).emit("offer", offer);
   });
 
-  // socket.on() is used to listen to the events. can be used both on client and server side
+  socket.on("answer", (roomId, answer) => {
+    socket.to(roomId).emit("answer", answer);
+  });
+
+  socket.on("ice-candidate", (roomId, candidate) => {
+    socket.to(roomId).emit("ice-candidate", candidate);
+  });
 
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);

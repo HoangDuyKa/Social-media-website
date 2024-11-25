@@ -11,11 +11,12 @@ import { upload } from "../utils/upload.js";
 
 const router = express.Router();
 
+/* CREATE */
 router.post("/register", upload.single("picture"), register, sendOTP);
-router.post("/verify", verifyOTP);
 
+/* UPDATE */
 router.post("/login", login);
-
+router.post("/verify", verifyOTP);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 

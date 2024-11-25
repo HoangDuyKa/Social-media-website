@@ -13,13 +13,18 @@ import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from "phosphor-react";
 import StyledBadge from "components/StyledBadge";
 import { toggleRightbar } from "Redux/Slice/app";
 import { useDispatch, useSelector } from "react-redux";
-
+import { v4 as uuidV4 } from "uuid";
 const ChatHeader = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { current_conversation } = useSelector(
     (state) => state.conversation.direct_chat
   );
+
+  const handleVideoCall = () => {
+    const roomId = uuidV4(); // Generate a unique room ID
+    window.open(`/video-call/${roomId}`, "_blank");
+  };
   // const fullName = `${current_conversation?.firstName} ${current_conversation?.lastName}`;
   const onlineUsers = useSelector((state) => state.app.onlineUsers);
 
@@ -78,7 +83,7 @@ const ChatHeader = () => {
           </Stack>
         </Stack>
         <Stack direction={"row"} alignItems={"center"} spacing={3}>
-          <IconButton>
+          <IconButton onClick={handleVideoCall}>
             <VideoCamera />
           </IconButton>
           <IconButton>

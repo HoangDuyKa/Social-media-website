@@ -3,6 +3,8 @@ import FriendRequest from "../models/friendRequest.js";
 import bcrypt from "bcrypt";
 import { createNotifications } from "./notification.js";
 
+/* CREATE */
+
 /* READ */
 export const getUser = async (req, res) => {
   try {
@@ -12,6 +14,26 @@ export const getUser = async (req, res) => {
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
+};
+
+export const getUsers = async (req, res, next) => {
+  const all_users = await User.find().select(
+    "firstName lastName _id picturePath"
+  );
+
+  const this_user = req.user;
+
+  const remaining_users = all_users.filter(
+    (user) =>
+      !this_user.friends.includes(user._id) &&
+      user._id.toString() !== req.user._id.toString()
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: remaining_users,
+    message: "Users found successfully!",
+  });
 };
 
 export const getUserFriends = async (req, res) => {
@@ -33,51 +55,66 @@ export const getUserFriends = async (req, res) => {
   }
 };
 
-/* UPDATE */
-export const addRemoveFriend = async (req, res) => {
+export const getUsersForSidebar = async (req, res) => {
   try {
-    const { id, friendId } = req.params;
-    const user = await User.findById(id);
-    const friend = await User.findById(friendId);
-    const notificationMessage = `${user.firstName} sent you a friend request`;
-    const senderImage = user.picturePath;
+    const loggedInUserId = req.user._id.toString();
+    const filteredUsers = await User.find({
+      _id: { $ne: loggedInUserId },
+    }).select("-password");
 
-    if (user.friends.includes(friendId)) {
-      user.friends = user.friends.filter((id) => id !== friendId);
-      friend.friends = friend.friends.filter((_id) => _id !== id);
-    } else {
-      user.friends.push(friendId);
-      friend.friends.push(id);
-
-      if (id !== user._id) {
-        createNotifications(
-          friendId,
-          senderImage,
-          "friend_request",
-          notificationMessage,
-          friendId
-        );
-      }
-    }
-
-    await user.save();
-    await friend.save();
-
-    const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
-    );
-    const formattedFriends = friends.map(
-      ({ _id, firstName, lastName, occupation, location, picturePath }) => {
-        return { _id, firstName, lastName, occupation, location, picturePath };
-      }
-    );
-
-    res.status(200).json(formattedFriends);
-  } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(200).json(filteredUsers);
+  } catch (error) {
+    console.error("Error in getUsersForSidebar: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
+export const getRequests = async (req, res, next) => {
+  const requests = await FriendRequest.find({ recipient: req.user._id })
+    .populate("sender")
+    .select("_id firstName lastName picturePath");
+
+  res.status(200).json({
+    status: "success",
+    data: requests,
+    message: "Requests found successfully!",
+  });
+};
+
+export const getOnlineUsersInformation = async (req, res) => {
+  try {
+    const { onlineUsers } = req.body; // Array of user IDs from the client
+    const currentUserId = req.user.id; // Assuming the authenticated user's ID is in the token payload
+
+    if (!Array.isArray(onlineUsers) || onlineUsers.length === 0) {
+      return res.status(400).json({ error: 'Invalid or empty onlineUsers array.' });
+    }
+
+    // Exclude the current userId from the query
+    const users = await User.find({
+      _id: { $in: onlineUsers, $ne: currentUserId } // $ne excludes the current user
+    }).select('_id firstName lastName occupation picturePath');
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error fetching online users:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+// export const getFriends = async (req, res, next) => {
+//   const this_user = await User.findById(req.user._id).populate(
+//     "friends",
+//     "_id firstName lastName"
+//   );
+//   res.status(200).json({
+//     status: "success",
+//     data: this_user.friends,
+//     message: "Friends found successfully!",
+//   });
+// };
+
+/* UPDATE */
 export const updateUser = async (req, res) => {
   const { userId } = req.params;
   const {
@@ -129,63 +166,49 @@ export const updateUser = async (req, res) => {
   }
 };
 
-export const getUsersForSidebar = async (req, res) => {
+export const addRemoveFriend = async (req, res) => {
   try {
-    const loggedInUserId = req.user._id.toString();
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
+    const { id, friendId } = req.params;
+    const user = await User.findById(id);
+    const friend = await User.findById(friendId);
+    const notificationMessage = `${user.firstName} sent you a friend request`;
+    const senderImage = user.picturePath;
 
-    res.status(200).json(filteredUsers);
-  } catch (error) {
-    console.error("Error in getUsersForSidebar: ", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    if (user.friends.includes(friendId)) {
+      user.friends = user.friends.filter((id) => id !== friendId);
+      friend.friends = friend.friends.filter((_id) => _id !== id);
+    } else {
+      user.friends.push(friendId);
+      friend.friends.push(id);
+
+      if (id !== user._id) {
+        createNotifications(
+          friendId,
+          senderImage,
+          "friend_request",
+          notificationMessage,
+          friendId
+        );
+      }
+    }
+
+    await user.save();
+    await friend.save();
+
+    const friends = await Promise.all(
+      user.friends.map((id) => User.findById(id))
+    );
+    const formattedFriends = friends.map(
+      ({ _id, firstName, lastName, occupation, location, picturePath }) => {
+        return { _id, firstName, lastName, occupation, location, picturePath };
+      }
+    );
+
+    res.status(200).json(formattedFriends);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
   }
 };
-
-export const getUsers = async (req, res, next) => {
-  const all_users = await User.find().select(
-    "firstName lastName _id picturePath"
-  );
-
-  const this_user = req.user;
-
-  const remaining_users = all_users.filter(
-    (user) =>
-      !this_user.friends.includes(user._id) &&
-      user._id.toString() !== req.user._id.toString()
-  );
-
-  res.status(200).json({
-    status: "success",
-    data: remaining_users,
-    message: "Users found successfully!",
-  });
-};
-
-export const getRequests = async (req, res, next) => {
-  const requests = await FriendRequest.find({ recipient: req.user._id })
-    .populate("sender")
-    .select("_id firstName lastName picturePath");
-
-  res.status(200).json({
-    status: "success",
-    data: requests,
-    message: "Requests found successfully!",
-  });
-};
-
-// export const getFriends = async (req, res, next) => {
-//   const this_user = await User.findById(req.user._id).populate(
-//     "friends",
-//     "_id firstName lastName"
-//   );
-//   res.status(200).json({
-//     status: "success",
-//     data: this_user.friends,
-//     message: "Friends found successfully!",
-//   });
-// };
 
 export const lockUser = async (req, res) => {
   try {
@@ -214,7 +237,7 @@ export const lockUser = async (req, res) => {
   }
 };
 
-
+/* DELETE */
 export const destroyUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -228,3 +251,4 @@ export const destroyUser = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
+

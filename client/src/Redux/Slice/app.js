@@ -5,6 +5,7 @@ const initialState = {
   posts: [],
   rightBarChat: { open: false, type: "CONTACT" },
   onlineUsers: [],
+  onlineUsersObject: [],
   users: [],
   // all_users: [],
   friends: [], // all friends
@@ -43,6 +44,9 @@ export const appSlice = createSlice({
     setOnlineUsers: (state, action) => {
       state.onlineUsers = action.payload.onlineUsers;
     },
+    setOnlineUsersObject: (state, action) => {
+      state.onlineUsersObject = action.payload.onlineUsersObject;
+    },
     updateUsers(state, action) {
       state.users = action.payload.users;
     },
@@ -67,6 +71,7 @@ export const {
   setOnlineUsers,
   updateUsers,
   setSearchResults,
+  setOnlineUsersObject
 } = appSlice.actions;
 export default appSlice.reducer;
 

@@ -99,21 +99,6 @@ export const conversationSlice = createSlice({
         pinned: false,
       });
     },
-    // setCurrentConversation(state, action) {
-    //   state.direct_chat.current_conversation = action.payload;
-    // },
-    // fetchCurrentMessages(state, action) {
-    //   const messages = action.payload.messages;
-    //   const formatted_messages = messages.map((el) => ({
-    //     id: el._id,
-    //     type: "msg",
-    //     subtype: el.type,
-    //     message: el.text,
-    //     incoming: el.to
-    //     outgoing: el.from === user_id,
-    //   }));
-    //   state.direct_chat.current_messages = formatted_messages;
-    // },
     addDirectMessage(state, action) {
       state.direct_chat.current_messages.push(action.payload.message);
     },
@@ -132,18 +117,6 @@ export const FetchDirectConversations = ({ conversations }) => {
   };
 };
 
-export const AddDirectConversation = ({ conversation }) => {
-  return async (dispatch, getState) => {
-    dispatch(conversationSlice.actions.addDirectConversation({ conversation }));
-  };
-};
-export const UpdateDirectConversation = ({ conversation }) => {
-  return async (dispatch, getState) => {
-    dispatch(
-      conversationSlice.actions.updateDirectConversation({ conversation })
-    );
-  };
-};
 
 export const SetCurrentConversation = (current_conversation) => {
   return async (dispatch, getState) => {
@@ -153,14 +126,4 @@ export const SetCurrentConversation = (current_conversation) => {
   };
 };
 
-// export const FetchCurrentMessages = ({ messages }) => {
-//   return async (dispatch, getState) => {
-//     dispatch(conversationSlice.actions.fetchCurrentMessages({ messages }));
-//   };
-// };
 
-export const AddDirectMessage = (message) => {
-  return async (dispatch, getState) => {
-    dispatch(conversationSlice.actions.addDirectMessage({ message }));
-  };
-};

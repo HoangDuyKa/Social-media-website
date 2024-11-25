@@ -63,7 +63,6 @@ const Navbar = () => {
     socket?.on("newMessage", (newMessage) => {
       // newMessage.shouldShake = true;
       const sound = new Audio(notificationSound);
-      console.log("yes");
       sound.play();
     });
 
@@ -147,7 +146,7 @@ const Navbar = () => {
             >
               <MenuItem
                 value={fullName}
-                onClick={() => navigate(`/profile/edit/${user._id}`)}
+                onClick={() => navigate(`/profile/${user._id}`)}
               >
                 <Typography>{fullName}</Typography>
                 {/* <Typography >Profile</Typography> */}
