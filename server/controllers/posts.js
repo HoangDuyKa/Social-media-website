@@ -60,7 +60,6 @@ export const createAnniversaryPosts = async () => {
         $lte: endOfDayAnniversary,
       },
       deleted: false,
-      // alreadyAniversary: false,
     });
 
     for (const post of posts) {
@@ -148,12 +147,11 @@ export const savePost = async (req, res) => {
   }
 };
 
-
 /* READ */
 export const getFeedPosts = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { page, limit } = req.query; 
+    const { page, limit } = req.query;
 
     // Convert page and limit to numbers for calculation
     const pageNumber = parseInt(page, 10);
@@ -811,4 +809,3 @@ export const unsavePost = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
-

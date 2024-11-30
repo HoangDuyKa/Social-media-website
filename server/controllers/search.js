@@ -21,8 +21,9 @@ export const getSearchs = async (req, res) => {
       });
 
       // Tìm kiếm bài viết theo mô tả
-      posts = await Post.find({isAnniversaryPost: false,
-        status:"public",
+      posts = await Post.find({
+        isAnniversaryPost: false,
+        status: "public",
         description: { $regex: query, $options: "i" },
       })
         .populate({
@@ -64,31 +65,4 @@ export const getSearchs = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-  //   try {
-  //     const { query } = req.query;
-
-  //     // Tách query thành các từ để tìm kiếm theo họ tên
-  //     const nameParts = query.split(" ");
-  //     const firstNameQuery = nameParts[0];
-  //     const lastNameQuery = nameParts.length > 1 ? nameParts[1] : "";
-
-  //     // Tìm kiếm người dùng theo tên
-  //     const users = await User.find({
-  //       $or: [
-  //         { firstName: { $regex: firstNameQuery, $options: "i" } },
-  //         { lastName: { $regex: lastNameQuery, $options: "i" } },
-  //         { email: { $regex: query, $options: "i" } },
-  //       ],
-  //     });
-
-  //     const postRegex = new RegExp(query, "i");
-
-  //     const posts = await Post.find({
-  //       description: postRegex,
-  //     }).populate("userId", "name email");
-
-  //     res.status(200).json({ users, posts });
-  //   } catch (error) {
-  //     res.status(500).json({ message: error.message });
-  //   }
 };

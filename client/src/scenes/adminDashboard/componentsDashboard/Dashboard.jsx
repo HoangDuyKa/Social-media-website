@@ -189,9 +189,23 @@ const Dashboard = () => {
           }
         });
 
-        // Update the state for barData
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+
         const barDataFormatted = monthlyCounts.map((count, index) => ({
-          name: `Tháng ${index + 1}`,
+          name: monthNames[index], // Use the month abbreviation based on the index
           posts: count,
         }));
         setBarData(barDataFormatted);
@@ -203,8 +217,8 @@ const Dashboard = () => {
 
         // For pie chart, use today's and this month's counts
         setPieData([
-          { name: "Hôm nay", value: postsToday },
-          { name: "Tháng này", value: postsThisMonth },
+          { name: "Today", value: postsToday },
+          { name: "This Month", value: postsThisMonth },
         ]);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -223,21 +237,21 @@ const Dashboard = () => {
         {/* Widget Tổng Số Bài Viết */}
         <Grid item xs={12} sm={4}>
           <Item>
-            <Typography variant="h6">Tổng Số Bài Viết</Typography>
+            <Typography variant="h6">Total Posts</Typography>
             <Typography variant="h4">{totalPosts}</Typography>
           </Item>
         </Grid>
         {/* Widget Người Dùng Hôm Nay */}
         <Grid item xs={12} sm={4}>
           <Item>
-            <Typography variant="h6">Người Dùng Hôm Nay</Typography>
+            <Typography variant="h6">Today's Users</Typography>
             <Typography variant="h4">{usersToday}</Typography>
           </Item>
         </Grid>
         {/* Widget Người Dùng Tháng Này */}
         <Grid item xs={12} sm={4}>
           <Item>
-            <Typography variant="h6">Người Dùng Tháng Này</Typography>
+            <Typography variant="h6">Users This Month</Typography>
             <Typography variant="h4">{usersThisMonth}</Typography>
           </Item>
         </Grid>
@@ -245,7 +259,7 @@ const Dashboard = () => {
         <Grid item xs={12} md={8}>
           <Item>
             <Typography variant="h6" gutterBottom>
-              Số Bài Viết Theo Tháng
+              Number of Posts Per Month
             </Typography>
             <BarChart width={600} height={300} data={barData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -261,7 +275,7 @@ const Dashboard = () => {
         <Grid item xs={12} md={4}>
           <Item>
             <Typography variant="h6" gutterBottom>
-              Thống Kê Người Dùng
+              User Statistics
             </Typography>
             <PieChart width={400} height={300}>
               <Pie

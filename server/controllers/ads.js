@@ -4,7 +4,7 @@ import Ads from "../models/ads.js";
 export const createAds = async (req, res) => {
   try {
     const { websiteUrl, description, expireInHours, branch } = req.body;
-    const imageUrl = req.file.path; 
+    const imageUrl = req.file.path;
     console.log(imageUrl);
     //calculate time when expired base on expireInHours that user input
     const expireDate = new Date();
@@ -54,7 +54,7 @@ export const getRandomAds = async (req, res) => {
 
 export const getAllAds = async (req, res) => {
   try {
-    const ads = await Ads.find(); // Lấy tất cả quảng cáo từ database
+    const ads = await Ads.find();
 
     //calculate remain hours for each ads
     const currentTime = new Date();
@@ -88,4 +88,3 @@ export const destroyAds = async (req, res) => {
     res.status(500).json({ error: "Failed to delete ad" });
   }
 };
-

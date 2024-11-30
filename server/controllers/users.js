@@ -36,19 +36,58 @@ export const getUsers = async (req, res, next) => {
   });
 };
 
+// export const getUserFriends = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const user = await User.findById(id);
+
+//     const friends = await Promise.all(
+//       user.friends.map((id) => User.findById(id))
+//     );
+//     const formattedFriends = friends.map(
+//       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
+//         return {
+//           _id,
+//           firstName,
+//           lastName,
+//           occupation,
+//           location,
+//           picturePath,
+//         };
+//       }
+//     );
+//     res.status(200).json(formattedFriends);
+//   } catch (err) {
+//     res.status(404).json({ message: err.message });
+//   }
+// };
+
 export const getUserFriends = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
 
-    const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
+    // Sort friends by dateAdded (assuming each friend has a 'dateAdded' field)
+    const sortedFriends = user.friends.sort(
+      (a, b) => b.createdAt - a.createdAt
     );
+
+    // Limit the result to a maximum of 6 friends
+    const topFriends = sortedFriends.slice(0, 6);
+
+    // Fetch data for the top 6 friends
+    const friends = await Promise.all(
+      topFriends.map((friendId) => User.findById(friendId))
+    );
+
+    // Format the friend data
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
         return { _id, firstName, lastName, occupation, location, picturePath };
       }
     );
+
+    // Send the formatted friend data as the response
     res.status(200).json(formattedFriends);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -87,18 +126,20 @@ export const getOnlineUsersInformation = async (req, res) => {
     const currentUserId = req.user.id; // Assuming the authenticated user's ID is in the token payload
 
     if (!Array.isArray(onlineUsers) || onlineUsers.length === 0) {
-      return res.status(400).json({ error: 'Invalid or empty onlineUsers array.' });
+      return res
+        .status(400)
+        .json({ error: "Invalid or empty onlineUsers array." });
     }
 
     // Exclude the current userId from the query
     const users = await User.find({
-      _id: { $in: onlineUsers, $ne: currentUserId } // $ne excludes the current user
-    }).select('_id firstName lastName occupation picturePath');
+      _id: { $in: onlineUsers, $ne: currentUserId }, // $ne excludes the current user
+    }).select("_id firstName lastName occupation picturePath");
 
     res.status(200).json(users);
   } catch (error) {
-    console.error('Error fetching online users:', error);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.error("Error fetching online users:", error);
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
@@ -214,11 +255,11 @@ export const lockUser = async (req, res) => {
   try {
     const { id } = req.params; // id of post
     const user = await User.findById(id);
-    const isLocked = user.lock === true
+    const isLocked = user.lock === true;
     if (isLocked) {
-      user.lock = false
+      user.lock = false;
     } else {
-      user.lock = true
+      user.lock = true;
     }
     await user.save();
 
@@ -226,11 +267,11 @@ export const lockUser = async (req, res) => {
     const remainUser = await User.find({
       _id: { $ne: loggedInUserId },
     }).select("-password");
-  
+
     res.status(200).json({
       status: "success",
       data: remainUser,
-      message: isLocked? "Unlock User Successfully": "Lock User Successfully",
+      message: isLocked ? "Unlock User Successfully" : "Lock User Successfully",
     });
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -251,4 +292,3 @@ export const destroyUser = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
-

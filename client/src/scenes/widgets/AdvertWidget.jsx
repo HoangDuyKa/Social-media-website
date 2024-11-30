@@ -21,8 +21,7 @@ const AdvertWidget = () => {
   }, []);
 
   const handleNavigation = () => {
-    // Điều hướng đến một URL bên ngoài
-    // window.location.href = ads.websiteUrl; // Điều hướng đến URL từ ads.websiteUrl
+    // window.location.href = ads.websiteUrl;
 
     window.open(ads.websiteUrl, "_blank"); // Mở URL trong tab mới
   };

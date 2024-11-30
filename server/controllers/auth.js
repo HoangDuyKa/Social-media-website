@@ -49,15 +49,9 @@ export const register = async (req, res, next) => {
           validateModifiedOnly: true,
         }
       );
-      console.log("else if");
-
-      // generate an otp and send to email
       req.userId = existing_user._id;
       next();
     } else {
-      // const new_user = await User.create(req.body);
-      console.log("else");
-
       const newUser = new User({
         firstName,
         lastName,
@@ -217,7 +211,7 @@ export const forgotPassword = async (req, res, next) => {
 
   // 3) Send it to user's email
   try {
-    const resetURL = `http://localhost:3000/new-password?token=${resetToken}`;
+    const resetURL = `${process.env.CLIENT_URL}/new-password?token=${resetToken}`;
     // TODO => Send Email with this Reset URL to user's email address
 
     console.log(resetURL);

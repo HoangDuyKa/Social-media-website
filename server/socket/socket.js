@@ -116,33 +116,6 @@ io.on("connection", async (socket) => {
     callback(existing_conversations);
   });
 
-  // Join Room
-  socket.on("join-room", (roomId) => {
-    console.log(`User ${socket.id} joined room ${roomId}`);
-    socket.join(roomId);
-
-    socket.to(roomId).emit("user-connected", socket.id);
-
-    // Handle disconnection
-    socket.on("disconnect", () => {
-      console.log(`User ${socket.id} disconnected`);
-      socket.to(roomId).emit("user-disconnected", socket.id);
-    });
-  });
-
-  // Handle WebRTC Signaling
-  socket.on("offer", (roomId, offer) => {
-    socket.to(roomId).emit("offer", offer);
-  });
-
-  socket.on("answer", (roomId, answer) => {
-    socket.to(roomId).emit("answer", answer);
-  });
-
-  socket.on("ice-candidate", (roomId, candidate) => {
-    socket.to(roomId).emit("ice-candidate", candidate);
-  });
-
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
     delete userSocketMap[userId];
