@@ -9,6 +9,7 @@ import {
   Public,
   ReportGmailerrorred,
   Save,
+  Check,
 } from "@mui/icons-material";
 import {
   Box,
@@ -29,9 +30,10 @@ import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 import StyledBadge from "./StyledBadge";
 import { DotsThreeVertical, Pencil } from "phosphor-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { setPost, setPosts } from "Redux/Slice/app";
-
+import { getSocket } from "socket";
+const user_id = window.localStorage.getItem("user_id");
 const Friend = ({
   friendId,
   name,
@@ -47,6 +49,7 @@ const Friend = ({
   statusPost,
   editingPost,
   setEditingPost,
+  isProfile,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -54,13 +57,14 @@ const Friend = ({
   const token = useSelector((state) => state.auth.token);
   const { friends } = useSelector((state) => state.auth.user);
   const apiUrl = process.env.REACT_APP_API_URL;
-
+  const socket = getSocket();
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
-
+  const { firstName } = useSelector((state) => state.auth.user);
+  const [friendRequests, setFriendRequests] = useState([]);
   const isFriend = friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
@@ -200,6 +204,23 @@ const Friend = ({
     }
   };
 
+  const getFriendRequest = async () => {
+    try {
+      const responses = await fetch(`${apiUrl}/users/get-requests`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const response = await responses.json();
+      setFriendRequests(response.data);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getFriendRequest();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onlineUsers = useSelector((state) => state.app.onlineUsers);
 
   const online = onlineUsers.includes(friendId);
@@ -301,19 +322,61 @@ const Friend = ({
               statusPost={statusPost}
               setEditingPost={setEditingPost}
               editingPost={editingPost}
+              socket={socket}
+              friendId={friendId}
+              isProfile={isProfile}
             />
           </IconButton>
         ) : userId === _id ? (
           <></>
         ) : (
           <IconButton
-            onClick={() => patchFriend()}
+            // onClick={
+            //   isFriend
+            //     ? () => patchFriend()
+            //     : () => {
+            //         socket.emit(
+            //           "friend_request",
+            //           { to: friendId, from: user_id, name: firstName }
+            //           // toast.success("Request sent")
+            //         );
+            //       }
+            // }
             sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
           >
-            {isFriend ? (
-              <PersonRemoveOutlined sx={{ color: primaryDark }} />
+            {friendRequests?.some(
+              (request) => request.sender._id === friendId
+            ) ? (
+              <Check
+                sx={{ cursor: "pointer" }}
+                onClick={() => {
+                  const request = friendRequests.find(
+                    (request) => request.sender._id === friendId
+                  );
+                  if (request) {
+                    socket.emit("accept_request", { request_id: request._id });
+                    window.location.reload();
+                  } else {
+                    console.error("Friend request not found");
+                  }
+                }}
+              />
+            ) : isFriend ? (
+              <PersonRemoveOutlined
+                onClick={() => patchFriend()}
+                sx={{ color: primaryDark }}
+              />
             ) : (
-              <PersonAddOutlined sx={{ color: primaryDark }} />
+              <PersonAddOutlined
+                onClick={() => {
+                  socket.emit("friend_request", {
+                    to: friendId,
+                    from: user_id,
+                    name: firstName,
+                  });
+                }}
+                sx={{ color: primaryDark }}
+              />
             )}
           </IconButton>
         )}
@@ -340,16 +403,22 @@ const PostOption = ({
   editPost,
   setEditingPost,
   editingPost,
+  socket,
+  friendId,
+  isProfile,
 }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const { firstName } = useSelector((state) => state.auth.user);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const Post_options = trashPosts
     ? [
         {
@@ -378,13 +447,26 @@ const PostOption = ({
           },
           icon: storagePage ? <Delete /> : <Save />,
         },
-        {
-          title: isFriend ? "Remove Friend" : "Add Friend",
-          handleClick: () => {
-            patchFriend().then(handleClose);
-          },
-          icon: isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />,
-        },
+        isProfile ? (
+          <></>
+        ) : (
+          {
+            title: isFriend ? "Remove Friend" : "Add Friend",
+            handleClick: isFriend
+              ? () => {
+                  patchFriend().then(handleClose);
+                }
+              : () => {
+                  socket.emit(
+                    "friend_request",
+                    { to: friendId, from: user_id, name: firstName },
+                    handleClose()
+                    // toast.success("Request sent")
+                  );
+                },
+            icon: isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />,
+          }
+        ),
 
         {
           title: "Report",

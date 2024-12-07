@@ -28,7 +28,7 @@ import {
   setUnreadConversation,
   FetchDirectConversations,
 } from "Redux/Slice/conversation";
-import Friends from "scenes/Dialog/FriendsDialog";
+import Friends from "components/Dialog/FriendsDialog";
 
 const user_id = window.localStorage.getItem("user_id");
 

@@ -59,6 +59,19 @@ export const initializeSocket = (userId, dispatch) => {
   socket.on("getOnlineUsers", (users) => {
     dispatch(setOnlineUsers({ onlineUsers: users }));
   });
+
+  socket.on("request_sent", (data) => {
+    toast.success(data.message);
+  });
+
+  // socket.on("new_friend_request", (data) => {
+  //   toast.success(data.message);
+  // });
+
+  socket.on("request_already_sent", (data) => {
+    toast.warning(data.message);
+  });
+
   socket.on("receiverNofi", (noti) => {
     // toast.success(noti.message);
     if (!document.hasFocus() || document.hasFocus()) {

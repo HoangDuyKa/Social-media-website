@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "Redux/Slice/auth";
@@ -11,6 +11,7 @@ const FriendListWidget = ({ userId, style }) => {
   const { palette } = useTheme();
   const token = useSelector((state) => state.auth.token);
   const { friends } = useSelector((state) => state.auth.user);
+  // const [friends, setFriends] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const getFriends = async () => {
@@ -23,6 +24,7 @@ const FriendListWidget = ({ userId, style }) => {
       if (data.error) {
         throw new Error(data.error);
       }
+      // setFriends(data);
       dispatch(setFriends({ friends: data }));
     } catch (error) {
       toast.error(error.message);

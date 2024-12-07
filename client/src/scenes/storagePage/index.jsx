@@ -29,7 +29,6 @@ const StoragePost = () => {
           flexBasis={isNonMobileScreens ? "80%" : undefined}
           // mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          {/* <PostTrashComponent /> */}
           <PostsWidget userId={_id} picturePath={picturePath} storagePage />
         </Box>
       </Box>

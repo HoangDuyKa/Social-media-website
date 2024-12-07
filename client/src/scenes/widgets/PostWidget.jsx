@@ -47,6 +47,7 @@ const PostWidget = ({
   anniversariesCelebrated,
   statusPost,
   createdAt,
+  isProfile,
 }) => {
   const [isComments, setIsComments] = useState(detailPost);
   const [isPreviewPDF, SetIsPreviewPDF] = useState(false);
@@ -315,6 +316,7 @@ const PostWidget = ({
         statusPost={statusPost}
         editingPost={editingPost}
         setEditingPost={setEditingPost}
+        isProfile={isProfile}
       />
 
       {editingPost ? (

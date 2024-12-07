@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FriendListWidget from "./FriendListWidget";
-import Friends from "scenes/Dialog/FriendsDialog";
+import Friends from "components/Dialog/FriendsDialog";
 import { toast } from "sonner";
 const FeatureWidget = ({ userId }) => {
   const [openDialog, setOpenDialog] = useState(false);

@@ -6,6 +6,7 @@ import User from "../models/User.js";
 import FriendRequest from "../models/friendRequest.js";
 // import Message from "../models/message.js";
 import Conversation from "../models/conversation.js";
+import { createNotifications } from "../controllers/notification.js";
 
 const app = express();
 
@@ -33,35 +34,57 @@ io.on("connection", async (socket) => {
   const userId = socket.handshake.query.userId;
   if (userId != "undefined") userSocketMap[userId] = socket.id;
 
+  //Other listeners
   // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("friend_request", async (data) => {
-    const to = await User.findById(data.to).select("socket_id");
-    const from = await User.findById(data.from).select("socket_id");
-    console.log(to);
-    console.log(from);
+    try {
+      const toSocketId = userSocketMap[data.to];
+      const fromSocketId = userSocketMap[data.from];
 
-    // create a friend request
-    await FriendRequest.create({
-      sender: data.from,
-      recipient: data.to,
-    });
-    // emit event request received to recipient
-    io.to(to?.socket_id).emit("new_friend_request", {
-      message: "New friend request received",
-    });
-    io.to(from?.socket_id).emit("request_sent", {
-      message: "Request Sent successfully!",
-    });
+      // if (!toSocketId || !fromSocketId) {
+      //   console.error("Recipient or sender socket_id missing.");
+      //   return;
+      // }
+
+      const existingRequest = await FriendRequest.findOne({
+        sender: data.from,
+        recipient: data.to,
+      });
+
+      if (existingRequest) {
+        io.to(fromSocketId).emit("request_already_sent", {
+          message: "Friend request already sent.",
+        });
+        return;
+      }
+
+      await FriendRequest.create({ sender: data.from, recipient: data.to });
+
+      createNotifications(
+        data.to,
+        data.from, //id of sender
+        "Friend request",
+        `${data.name} have just sent you a friend request`,
+        data.to, //id of receiver
+        `/profile/${data.from}`
+      );
+
+      io.to(toSocketId).emit("new_friend_request", {
+        message: "New friend request received.",
+      });
+      io.to(fromSocketId).emit("request_sent", {
+        message: "Request sent successfully!",
+      });
+    } catch (error) {
+      console.error("Error handling friend request:", error);
+    }
   });
 
   socket.on("accept_request", async (data) => {
     // accept friend request => add ref of each other in friends array
-    console.log(data);
     const request_doc = await FriendRequest.findById(data.request_id);
-
-    console.log(request_doc);
 
     const sender = await User.findById(request_doc.sender);
     const receiver = await User.findById(request_doc.recipient);
@@ -73,8 +96,6 @@ io.on("connection", async (socket) => {
     await sender.save({ new: true, validateModifiedOnly: true });
 
     await FriendRequest.findByIdAndDelete(data.request_id);
-    // const { to, from } = data;
-    console.log(data);
     // check if there is any existing conversation
     const existing_conversations = await Conversation.find({
       participants: { $size: 2, $all: [receiver._id, sender._id] },
@@ -100,6 +121,40 @@ io.on("connection", async (socket) => {
     io.to(receiver?.socket_id).emit("request_accepted", {
       message: "Friend Request Accepted",
     });
+  });
+
+  socket.on("deny_request", async (data) => {
+    const { request_id } = data;
+
+    try {
+      // Find and delete the friend request by its ID
+      const request = await FriendRequest.findByIdAndDelete(request_id);
+
+      if (request) {
+        const senderSocketId = userSocketMap[request.sender];
+        const recipientSocketId = userSocketMap[request.recipient];
+
+        // Notify the sender about the denial
+        if (senderSocketId) {
+          io.to(senderSocketId).emit("request_denied", {
+            message: "Your friend request was denied.",
+          });
+        }
+
+        // Optionally, notify the recipient as well
+        if (recipientSocketId) {
+          io.to(recipientSocketId).emit("deny_confirmation", {
+            message: "Friend request denied successfully.",
+          });
+        }
+
+        console.log(`Friend request ${request_id} denied.`);
+      } else {
+        console.error(`Friend request with ID ${request_id} not found.`);
+      }
+    } catch (error) {
+      console.error("Error denying friend request:", error);
+    }
   });
 
   //Messages

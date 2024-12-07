@@ -71,7 +71,7 @@ export const {
   setOnlineUsers,
   updateUsers,
   setSearchResults,
-  setOnlineUsersObject
+  setOnlineUsersObject,
 } = appSlice.actions;
 export default appSlice.reducer;
 

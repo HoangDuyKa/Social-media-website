@@ -63,7 +63,7 @@ const NotificationItem = ({ notification }) => {
         return <Favorite style={{ color: theme.palette.error.main }} />;
       case "comment":
         return <Comment style={{ color: theme.palette.primary.main }} />;
-      case "friend_request":
+      case "Friend request":
         return <PersonAdd style={{ color: theme.palette.success.main }} />;
       default:
         return <CheckCircle style={{ color: theme.palette.grey[500] }} />;

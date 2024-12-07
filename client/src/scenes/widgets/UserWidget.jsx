@@ -3,26 +3,35 @@ import {
   EditOutlined,
   LocationOnOutlined,
   WorkOutlineOutlined,
+  PersonAddOutlined,
+  PersonRemoveOutlined,
+  CleaningServices,
+  Clear,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme } from "@mui/material";
 import UserImage from "components/UserImage";
 import FlexBetween from "components/FlexBetween";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
+import CheckIcon from "@mui/icons-material/Check";
+import { getSocket } from "socket";
+import { setFriends } from "Redux/Slice/auth";
 const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
   const [user, setUser] = useState(null);
+  const [friendRequests, setFriendRequests] = useState([]);
   const { palette } = useTheme();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
-  const logginUserId = useSelector((state) => state.auth.user);
+  const logginUser = useSelector((state) => state.auth.user);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const socket = getSocket();
+  const dispatch = useDispatch();
 
   const getUser = async () => {
     try {
@@ -39,9 +48,40 @@ const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
     }
   };
 
+  const getFriendRequest = async () => {
+    try {
+      const responses = await fetch(`${apiUrl}/users/get-requests`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const response = await responses.json();
+      setFriendRequests(response.data);
+      // dispatch({ friendRequests: response.data });
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const patchFriend = async () => {
+    const response = await fetch(
+      `${apiUrl}/users/${logginUser._id}/${userId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    // console.log(data);
+    dispatch(setFriends({ friends: data }));
+  };
+
   useEffect(() => {
     getUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    getFriendRequest();
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) {
     return null;
@@ -84,11 +124,64 @@ const UserWidget = ({ userId, picturePath, editUser, setEditUser }) => {
             <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
         </FlexBetween>
-        {logginUserId._id === user._id && (
+        {logginUser._id === user._id ? (
           <ManageAccountsOutlined
             sx={{ cursor: "pointer" }}
+            onClick={() => setEditUser(!editUser)}
+          />
+        ) : friendRequests?.some((request) => request.sender._id === userId) ? (
+          <Box
+            display="flex"
+            gap="1rem"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Clear
+              sx={{ cursor: "pointer" }}
+              onClick={() => {
+                // Find the request corresponding to the sender and get its _id
+                const request = friendRequests.find(
+                  (request) => request.sender._id === userId
+                );
+
+                if (request) {
+                  socket.emit("deny_request", { request_id: request._id });
+                  window.location.reload();
+                } else {
+                  console.error("Friend request not found");
+                }
+              }}
+            />
+
+            <CheckIcon
+              sx={{ cursor: "pointer" }}
+              onClick={() => {
+                const request = friendRequests.find(
+                  (request) => request.sender._id === userId
+                );
+                if (request) {
+                  socket.emit("accept_request", { request_id: request._id });
+                  window.location.reload();
+                } else {
+                  console.error("Friend request not found");
+                }
+              }}
+            />
+          </Box>
+        ) : user.friends.includes(logginUser._id) ? (
+          <PersonRemoveOutlined
+            sx={{ cursor: "pointer" }}
+            onClick={() => patchFriend().then(window.location.reload())}
+          />
+        ) : (
+          <PersonAddOutlined
+            sx={{ cursor: "pointer" }}
             onClick={() => {
-              setEditUser(!editUser);
+              socket.emit("friend_request", {
+                to: userId,
+                from: logginUser._id,
+                name: logginUser.firstName,
+              });
             }}
           />
         )}
