@@ -4,6 +4,7 @@ import mongooseDelete from "mongoose-delete";
 
 const userSchema = new mongoose.Schema(
   {
+    googleId: { type: String, unique: true },
     firstName: {
       type: String,
       required: true,
@@ -36,7 +37,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    lock:{
+    lock: {
       type: Boolean,
       default: false,
     },
@@ -75,12 +76,10 @@ userSchema.plugin(mongooseDelete, {
   deletedAt: true,
 });
 
-
 userSchema.plugin(mongooseDelete, {
   overrideMethods: "all",
   deletedAt: true,
 });
-
 
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");

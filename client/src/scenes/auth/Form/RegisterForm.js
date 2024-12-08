@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 // @mui
-import {  Stack, Alert, IconButton, InputAdornment } from "@mui/material";
+import { Stack, Alert, IconButton, InputAdornment } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
 import FormProvider, { RHFTextField } from "../../../components/hook-form";
@@ -30,7 +30,14 @@ export default function AuthRegisterForm() {
     email: Yup.string()
       .required("Email is required")
       .email("Email must be a valid email address"),
-    password: Yup.string().required("Password is required"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters long")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Password must contain at least one special character"
+      ),
   });
 
   const defaultValues = {
@@ -73,7 +80,9 @@ export default function AuthRegisterForm() {
       if (savedUser) {
         toast.info("Go to your mail to get the OTP and provide below");
         // navigate(`/verify/${values["email"]}`);
-        navigate(`/verify/${values["email"]}`, { state: { email: `${values["email"]}`} });
+        navigate(`/verify/${values["email"]}`, {
+          state: { email: `${values["email"]}` },
+        });
       }
     } catch (error) {
       toast.error(error.message);

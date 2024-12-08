@@ -19,6 +19,7 @@
     "@vercel/speed-insights": "^1.0.12",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
+    "firebase": "^11.0.2",
     "formik": "^2.2.9",
     "lodash": "^4.17.21",
     "phosphor-react": "^1.4.1",

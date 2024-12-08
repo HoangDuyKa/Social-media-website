@@ -712,6 +712,7 @@ export const destroyPost = async (req, res) => {
         path: "comments.replies.userReplyComment",
         select: "_id firstName lastName picturePath location",
       });
+
     res.status(200).json(remainPost);
   } catch (err) {
     res.status(404).json({ message: err.message });

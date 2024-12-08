@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+// import { OAuth2Client } from "google-auth-library";
+// const client = new OAuth2Client(YOUR_GOOGLE_CLIENT_ID);
 
 export const verifyToken = async (req, res, next) => {
   try {
@@ -34,3 +36,12 @@ export const verifyToken = async (req, res, next) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// export async function verifyGoogleToken(token) {
+//   const ticket = await client.verifyIdToken({
+//     idToken: token,
+//     audience: YOUR_GOOGLE_CLIENT_ID, // Ensure this matches your client ID
+//   });
+//   const payload = ticket.getPayload();
+//   return payload; // Contains user information like email, name, etc.
+// }

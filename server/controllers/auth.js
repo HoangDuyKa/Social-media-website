@@ -6,6 +6,7 @@ import otpGenerator from "otp-generator";
 import otp from "../Templates/Mail/otp.js";
 import resetPasswordTemplate from "../Templates/Mail/resetPassword.js";
 import crypto from "crypto";
+import mongoose from "mongoose";
 
 /* CREATE */
 export const register = async (req, res, next) => {
@@ -94,7 +95,9 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ error: "Invalid credentials. " });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
     //{ expiresIn: 60 }
     // delete user.password;
     const userWithoutPassword = user.toObject();
@@ -102,6 +105,37 @@ export const login = async (req, res) => {
     res.status(200).json({ token, user: userWithoutPassword });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const loginWithGoogle = async (req, res) => {
+  try {
+    const { user } = req.body;
+
+    // Destructure user data from the payload
+    const { uid, email, displayName, photoURL } = user;
+
+    let newUser = await User.findOne({ googleId: uid });
+    if (!newUser) {
+      newUser = await User.create({
+        googleId: uid,
+        email,
+        firstName: displayName.split(" ")[1] || "",
+        lastName: displayName.split(" ")[0] || "",
+        password: "none", // Password is empty for Google accounts
+        picturePath: photoURL || "",
+        verified: true, // Assume the email is verified since it's from Google
+      });
+    }
+
+    const jwtToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.status(200).json({ user: newUser, token: jwtToken });
+  } catch (error) {
+    console.error("Error in loginWithGoogle:", error.message);
+    res.status(400).json({ error: "Google login failed" });
   }
 };
 

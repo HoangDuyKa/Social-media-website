@@ -6,6 +6,7 @@ import {
   verifyOTP,
   forgotPassword,
   resetPassword,
+  loginWithGoogle,
 } from "../controllers/auth.js";
 import { upload } from "../utils/upload.js";
 
@@ -16,6 +17,7 @@ router.post("/register", upload.single("picture"), register, sendOTP);
 
 /* UPDATE */
 router.post("/login", login);
+router.post("/google-login", loginWithGoogle);
 router.post("/verify", verifyOTP);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
