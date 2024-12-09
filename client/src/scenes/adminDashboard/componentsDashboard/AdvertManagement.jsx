@@ -8,6 +8,8 @@ const AdvertManagement = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = useSelector((state) => state.auth.token);
   const [ads, setAds] = useState([]);
+  const [searchKey, setSearchKey] = useState("");
+
   const [adData, setAdData] = useState({
     websiteUrl: "",
     description: "",
@@ -36,7 +38,7 @@ const AdvertManagement = () => {
         branch: ad.branch,
         websiteUrl: ad.websiteUrl,
         description: ad.description,
-        hoursRemaining:ad.hoursRemaining,
+        hoursRemaining: ad.hoursRemaining,
         // hoursRemaining: calculateHoursRemaining(ad.expireDate), // Tính số giờ còn lại
         enabled: ad.enabled,
       }));
@@ -86,7 +88,7 @@ const AdvertManagement = () => {
             websiteUrl: newAd.websiteUrl,
             description: newAd.description,
             // hoursRemaining: calculateHoursRemaining(newAd.expireDate), // Tính số giờ còn lại
-            hoursRemaining:newAds.hoursRemaining,
+            hoursRemaining: newAds.hoursRemaining,
             enabled: newAd.enabled,
           },
         ]);
@@ -127,9 +129,7 @@ const AdvertManagement = () => {
       width: 150,
       // Render custom logic để hiển thị "Expired" nếu hoursRemaining là 0
       renderCell: (params) => (
-        <span>
-          {params.value > 0 ? `${params.value} hours` : "Expired"}
-        </span>
+        <span>{params.value > 0 ? `${params.value} hours` : "Expired"}</span>
       ),
     },
     {
@@ -150,8 +150,26 @@ const AdvertManagement = () => {
     },
   ];
 
+  const filteredAds = ads.filter(
+    (ad) =>
+      ad.branch.toLowerCase().includes(searchKey.toLowerCase()) ||
+      ad.description.toLowerCase().includes(searchKey.toLowerCase())
+  );
+
   return (
     <div style={{ padding: 20 }}>
+      <div>
+        <div style={{ marginBottom: "20px" }}>
+          <TextField
+            label="Search by branch and description"
+            variant="outlined"
+            fullWidth
+            value={searchKey}
+            onChange={(e) => setSearchKey(e.target.value)}
+          />
+        </div>
+      </div>
+
       <div>
         <TextField
           label="Website URL"
@@ -176,7 +194,7 @@ const AdvertManagement = () => {
         />
         <TextField
           label="Expire In Hours"
-          sx={{width:"150px"}}
+          sx={{ width: "150px" }}
           type="number"
           value={adData.expireInHours}
           onChange={(e) =>
@@ -194,10 +212,10 @@ const AdvertManagement = () => {
 
       <div style={{ height: 400, width: "100%", marginTop: 20 }}>
         <DataGrid
-          rows={ads}
+          rows={filteredAds}
           columns={columns}
           pageSize={5}
-          getRowId={(row) => row.id}  // Sử dụng trường id
+          getRowId={(row) => row.id} // Sử dụng trường id
         />
       </div>
     </div>

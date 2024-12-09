@@ -2,3 +2,7 @@ npm i react-redux @reduxjs/toolkit redux-persist react-dropzone dotenv formik yu
 
 ConnectU: Phản ánh sứ mệnh của nền tảng là kết nối người dùng và thúc đẩy các mối quan hệ có ý nghĩa.
 ConnectU: Reflects the platform's mission to connect users and foster meaningful relationships.
+
+Dear Sir/Madam,
+
+You can run this project by running this command npm i --force on both side client and server after that npm start on client and npm run dev on server side

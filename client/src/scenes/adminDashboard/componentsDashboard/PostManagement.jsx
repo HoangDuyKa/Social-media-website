@@ -1,50 +1,6 @@
-// import React from "react";
-// import { DataGrid } from "@mui/x-data-grid";
-// import { Button } from "@mui/material";
-
-// const PostManagement = () => {
-//   const columns = [
-//     { field: "id", headerName: "ID", width: 90 },
-//     { field: "title", headerName: "Title", width: 300 },
-//     { field: "author", headerName: "Author", width: 200 },
-//     {
-//       field: "actions",
-//       headerName: "Actions",
-//       width: 130,
-//       renderCell: (params) => (
-//         <Button
-//           variant="contained"
-//           color="secondary"
-//           onClick={() => handleDelete(params.row.id)}
-//         >
-//           Delete
-//         </Button>
-//       ),
-//     },
-//   ];
-
-//   const rows = [
-//     { id: 1, title: "Bài viết A", author: "Nguyễn Văn A" },
-//     { id: 2, title: "Bài viết B", author: "Trần Thị B" },
-//   ];
-
-//   const handleDelete = (id) => {
-//     // Xử lý khi click nút xóa
-//     console.log("Delete post:", id);
-//   };
-
-//   return (
-//     <div style={{ height: 400, width: "100%" }}>
-//       <DataGrid rows={rows} columns={columns} pageSize={5} />
-//     </div>
-//   );
-// };
-
-// export default PostManagement;
-
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -53,6 +9,7 @@ const PostManagement = () => {
   const [posts, setPosts] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = useSelector((state) => state.auth.token);
+  const [searchKey, setSearchKey] = useState("");
   const navigate = useNavigate();
 
   // Fetch posts from the API when the component mounts
@@ -141,10 +98,26 @@ const PostManagement = () => {
       ),
     },
   ];
+  const filteredPosts = posts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(searchKey.toLowerCase()) ||
+      post.author.toLowerCase().includes(searchKey.toLowerCase())
+  );
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
-      <DataGrid rows={posts} columns={columns} pageSize={5} />
+    <div>
+      <div style={{ marginBottom: "20px" }}>
+        <TextField
+          label="Search by title and author"
+          variant="outlined"
+          fullWidth
+          value={searchKey}
+          onChange={(e) => setSearchKey(e.target.value)}
+        />
+      </div>
+      <div style={{ height: 400, width: "100%" }}>
+        <DataGrid rows={filteredPosts} columns={columns} pageSize={5} />
+      </div>
     </div>
   );
 };

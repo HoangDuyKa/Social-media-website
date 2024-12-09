@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
-  const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = useSelector((state) => state.auth.token);
   const [users, setUsers] = useState([]);
+  const [searchKey, setSearchKey] = useState("");
 
   // Fetch posts from the API when the component mounts
   useEffect(() => {
@@ -30,7 +30,7 @@ const UserManagement = () => {
         name: user.firstName + " " + user.lastName, // Adjust as needed to show the author's name
         email: user.email,
         role: user.role,
-        lock:user.lock
+        lock: user.lock,
       }));
 
       setUsers(formattedUsers);
@@ -54,7 +54,7 @@ const UserManagement = () => {
         name: user.firstName + " " + user.lastName, // Adjust as needed to show the author's name
         email: user.email,
         role: user.role,
-        lock:user.lock
+        lock: user.lock,
       }));
 
       setUsers(formattedUsers);
@@ -77,7 +77,7 @@ const UserManagement = () => {
           "Content-Type": "application/json",
         },
       });
-      
+
       const data = await response.json();
 
       const allUsers = data.data;
@@ -86,7 +86,7 @@ const UserManagement = () => {
         name: user.firstName + " " + user.lastName, // Adjust as needed to show the author's name
         email: user.email,
         role: user.role,
-        lock:user.lock
+        lock: user.lock,
       }));
 
       setUsers(formattedUsers);
@@ -106,24 +106,24 @@ const UserManagement = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 210  ,
+      width: 210,
       renderCell: (params) => (
         <>
-        <Button
+          <Button
             variant="contained"
             color="primary"
-            style={{ marginRight: 10, minWidth:90 }}
+            style={{ marginRight: 10, minWidth: 90 }}
             onClick={() => handleLock(params.row.id)}
           >
-             {params.row.lock === true ? "Unlock" : "Lock"} 
+            {params.row.lock === true ? "Unlock" : "Lock"}
           </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => handleDelete(params.row.id)}
-        >
-          Delete
-        </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </Button>
         </>
       ),
     },
@@ -134,9 +134,26 @@ const UserManagement = () => {
   //   { id: 2, name: "Trần Thị B", email: "b@gmail.com", role: "Admin" },
   // ];
 
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchKey.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchKey.toLowerCase())
+  );
+
   return (
-    <div style={{ height: 400, width: "100%" }}>
-      <DataGrid rows={users} columns={columns} pageSize={5} />
+    <div>
+      <div style={{ marginBottom: "20px" }}>
+        <TextField
+          label="Search by name and email"
+          variant="outlined"
+          fullWidth
+          value={searchKey}
+          onChange={(e) => setSearchKey(e.target.value)}
+        />
+      </div>
+      <div style={{ height: 400, width: "100%" }}>
+        <DataGrid rows={filteredUsers} columns={columns} pageSize={5} />
+      </div>
     </div>
   );
 };
